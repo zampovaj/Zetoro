@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Paper Grabber Skeleton",
+    "version": "1.0",
+    "permissions": [
+        "downloads",
+        "activeTab",
+        "scripting",
+        "declarativeNetRequest"
+    ],
+    "host_permissions": [
+        "*://*://*",
+        "*://*://*"
+    ],
+    "action": {},
+    "background": {
+        "service_worker": "background.js"
+    }
+}

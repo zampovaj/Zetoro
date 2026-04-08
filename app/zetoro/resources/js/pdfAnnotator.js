@@ -134,7 +134,7 @@ class PDFAnnotator {
                         const rect = [
                             quad[0], // x min - bottom-left (x)
                             quad[1], // y min - bottom-left (y)
-                            quad[2], // x max - bottom-right (x)
+                            quad[2], // x max - top-right (x)
                             quad[5]  // y max - top-left (y)
                         ];
 
