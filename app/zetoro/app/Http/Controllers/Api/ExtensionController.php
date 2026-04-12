@@ -26,7 +26,7 @@ class ExtensionController extends Controller
         );
 
         return response()->json([
-            'message' => 'Paylload acceoetd and queued.',
+            'message' => 'Paylload accepted and queued.',
         ], 202);
     }
 }

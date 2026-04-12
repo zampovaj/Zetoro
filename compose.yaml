@@ -13,6 +13,18 @@ services:
     depends_on:
       - web
 
+  # automatic migrations
+  migrator:
+    build: ./app/zetoro
+    command: php artisan migrate --force
+    env_file:
+      - ./app/zetoro/.env.production
+    depends_on:
+      db:
+        # Waits until Postgres explicitly says it is ready to accept connections
+        condition: service_healthy
+    restart: "no"
+
   # Web Server Container
   web:
     build: ./app/zetoro
@@ -25,7 +37,8 @@ services:
       # The Bridge: Maps the host path to the internal container path
       - "${PDF_STORAGE_BASE_PATH}:/var/www/html/storage/app/pdf_vault"
     depends_on:
-      - db
+      migrator:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   # Background Queue Worker Container
@@ -38,17 +51,23 @@ services:
       # Worker also needs the bridge to save downloaded Zotero PDFs
       - "${PDF_STORAGE_BASE_PATH}:/var/www/html/storage/app/pdf_vault"
     depends_on:
-      - db
+      migrator:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   # PostgreSQL Database Container
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     env_file:
       - ./app/zetoro/.env.production
     volumes:
       - pg-data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
 
 volumes:
   pg-data:

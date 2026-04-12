@@ -3,4 +3,4 @@
 use App\Http\Controllers\Api\ExtensionController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/store', [ExtensionController::class, 'store']);
+Route::post('/extension', [ExtensionController::class, 'store']);

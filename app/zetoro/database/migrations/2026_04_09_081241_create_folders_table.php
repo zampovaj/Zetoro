@@ -14,12 +14,16 @@ return new class extends Migration
         Schema::create('folders', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('name');
-            $table->foreignUlid('parent_id')
-                ->nullable()
-                ->constrained('folders')
-                ->cascadeOnDelete();
+            $table->ulid('parent_id')->nullable();
 
             $table->timestamps();
+        });
+
+        Schema::table('folders', function (Blueprint $table) {
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('folders')
+                ->cascadeOnDelete();
         });
     }
 
