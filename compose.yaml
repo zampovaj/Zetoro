@@ -1,0 +1,56 @@
+services:
+  # caddy - reverse proxy on :8888
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      # HOST:CONTAINER -> Binds Windows 8888 to Caddy 8888. Port 80 is untouched.
+      - "8888:8888"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+  # Web Server Container
+  web:
+    build: ./app/zetoro
+    # Uses PHP's built-in server. For massive scale you'd use Nginx/Octane,
+    # but this handles thousands of daily requests easily.
+    command: php artisan serve --host=0.0.0.0 --port=80
+    env_file:
+      - ./app/zetoro/.env.production
+    volumes:
+      # The Bridge: Maps the host path to the internal container path
+      - "${PDF_STORAGE_BASE_PATH}:/var/www/html/storage/app/pdf_vault"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  # Background Queue Worker Container
+  worker:
+    build: ./app/zetoro
+    command: php artisan queue:work --tries=3
+    env_file:
+      - ./app/zetoro/.env.production
+    volumes:
+      # Worker also needs the bridge to save downloaded Zotero PDFs
+      - "${PDF_STORAGE_BASE_PATH}:/var/www/html/storage/app/pdf_vault"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  # PostgreSQL Database Container
+  db:
+    image: postgres:16-alpine
+    env_file:
+      - ./app/zetoro/.env.production
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  pg-data:
+  caddy_data:
+  caddy_config:
