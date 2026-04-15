@@ -6,7 +6,7 @@ use App\Casts\MetadataCast;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Article extends Model
 {
@@ -26,8 +26,8 @@ class Article extends Model
         return $this->belongsToMany(Folder::class);
     }
 
-    public function article(): HasOne
+    public function files(): HasMany
     {
-        return $this->hasOne(Article::class);
+        return $this->hasMany(File::class);
     }
 }

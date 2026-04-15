@@ -25,8 +25,10 @@ class MetadataCast implements CastsAttributes
             title: $data['title'] ?? null,
             doi: $data['doi'] ?? null,
             authors: $data['authors'] ?? [],
+            year: $data['year'] ?? null,
             page_count: $data['page_count'] ?? null,
             type: $data['type'] ?? 'article',
+            citations: $data['citations'] ?? [],
         );
     }
 
