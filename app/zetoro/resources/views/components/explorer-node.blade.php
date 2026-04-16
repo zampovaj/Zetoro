@@ -6,9 +6,6 @@
 
 
 @php
-    use App\Models\Folder;
-    use App\Models\Article;
-    use App\Models\File;
 
     /** @var \App\Models\Folder|\App\Models\Article|\App\Models\File $item */
     /** @var \Illuminate\Support\Collection $allFolders */
@@ -26,7 +23,7 @@
 
     $icon = match ($type) {
         'folder' => 'folder',
-        'article' => 'open-book',
+        'article' => 'book-open',
         'file' => 'document-text',
     };
 
@@ -49,7 +46,7 @@
             <flux:icon dynamic :name="$icon" class="size-4 text-zinc-400" />
 
             <span class="truncate text-zinc-700 dark:text-zinc-300">
-                {{ $type === 'article' ? $item->metadata['title'] ?? 'Untitled' : $item->name }}
+                {{ $type === 'article' ? $item->metadata->title ?? 'Untitled' : $item->name }}
             </span>
         </div>
 

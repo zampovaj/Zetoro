@@ -18,7 +18,7 @@ return new class extends Migration
                 ->constrained('articles')
                 ->cascadeOnDelete();
 
-            $table->string('name');
+            $table->string('name')->default('article');
             $table->string('path');
 
             $table->timestamps();

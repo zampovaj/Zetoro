@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('articles', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->jsonb('metadata');
-            $table->string('url');
-            
+            $table->string('url')->nullable();
+
             $table->timestamps();
         });
     }
