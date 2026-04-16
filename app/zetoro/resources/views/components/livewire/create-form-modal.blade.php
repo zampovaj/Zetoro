@@ -5,6 +5,7 @@ use Livewire\Attributes\On;
 use App\Livewire\Forms\ArticleForm;
 use App\Livewire\Forms\FolderForm;
 use App\Livewire\Forms\FileForm;
+use Flux\Flux;
 
 new class extends Component {
     public ?string $type = null;
@@ -19,7 +20,8 @@ new class extends Component {
     {
         $this->type = $type;
         $this->parentId = $parentId;
-        $this->dispatch('modal-open', name: 'create-modal');
+
+        Flux::modal('create-modal')->show();
     }
 
     public function save()
@@ -39,10 +41,17 @@ new class extends Component {
 ?>
 
 <div>
+    @php
+        $modalTitle = $type ? 'Create New ' . ucfirst($type) : 'Create New Item';
+        $modalSubtitle = $parentId ? 'Adding to the selected folder.' : 'Adding to the root workspace.';
+    @endphp
+
     @component('components.create-modal', [
         'name' => 'create-modal',
-        'title' => 'Create New ' . ucfirst($type),
+        'title' => $modalTitle,
+        'subtitle' => $modalSubtitle,
     ])
+
         @if ($type === 'article')
             <flux:input wire:model="articleForm.title" label="Title" required />
             <flux:input wire:model="articleForm.url" label="Source URL" />
@@ -59,5 +68,6 @@ new class extends Component {
                 Drag and drop PDF here
             </div>
         @endif
+
     @endcomponent
 </div>

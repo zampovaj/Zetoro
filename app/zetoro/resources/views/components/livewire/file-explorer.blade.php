@@ -11,9 +11,14 @@ new class extends Component {
     public Collection $rootFolders;
     public Collection $orphanArticles;
 
-    public function mount(): void
+    // TODO: use mount not boot, boot only for mock
+    // public function mount(): void
+    // {
+    //     $this->loadData();
+    // }
+
+    public function boot(): void
     {
-        // $this->loadData();
         $this->mockData();
     }
 
@@ -68,10 +73,11 @@ new class extends Component {
 
     public function triggerEdit(string $type, $itemId): void {}
 
-    public function triggerCreate(string $type, $itemId): void {}
+    public function triggerCreate(string $type, $itemId): void {
+        $this->dispatch('open-create-modal', type: $type, parentId: $itemId);
+    }
 
-    public function triggerDelete(string $type, $itemId): void
-    {
+    public function triggerDelete(string $type, $itemId): void {
         match ($type) {
             'folder' => Folder::destroy($itemId),
             'article' => Article::destroy($itemId),
@@ -88,12 +94,15 @@ new class extends Component {
 
 <div class="flex flex-col h-full">
     <div
-        class="p-3 border-b border-gray-700 flex justify-between items-center text-sm font-semibold uppercase tracking-wider text-gray-400">
+        class="py-3 border-b border-gray-700 flex justify-between items-center text-sm font-semibold uppercase tracking-wider text-gray-400">
         <span>Explorer</span>
-        <button class="hover:text-white" title="New Folder">+</button>
+
+        @component('create-dropdown', ['itemId' => null])
+        @endcomponent
+        <!-- <button class="hover:text-white px-3 text-xl" title="New Folder" wire:click='triggerCreate("folder", null)'>+</button> -->
     </div>
 
-    <div class="flex-1 overflow-y-auto p-2">
+    <div class="flex-1 overflow-y-auto py-2">
         <ul class="space-y-1">
 
             @foreach ($rootFolders as $rootFolder)

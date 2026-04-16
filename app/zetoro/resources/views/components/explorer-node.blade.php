@@ -59,10 +59,15 @@
             </button>
 
             @if ($isExpandable)
-                <button wire:click.stop='triggerCreate("{{ $type }}", "{{ $item->id }}")'
-                    class="p-1 text-zinc-400 hover:text-green-500 rounded">
-                    <flux:icon.plus class="size-3" />
-                </button>
+                @if ($type === 'article')
+                    <button wire:click.stop='triggerCreate("file", "{{ $item->id }}")'
+                        class="p-1 text-zinc-400 hover:text-green-500 rounded">
+                        <flux:icon.plus class="size-3" />
+                    </button>
+                @elseif ($type === 'folder')
+                    @component('create-dropdown', ['itemId' => $item->id])
+                    @endcomponent
+                @endif
             @endif
 
             <button wire:click.stop='triggerDelete("{{ $type }}", "{{ $item->id }}")'

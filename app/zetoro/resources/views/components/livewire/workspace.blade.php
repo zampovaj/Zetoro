@@ -74,7 +74,7 @@ new class extends Component {
             </div>
         @else
             <div class="flex items-center justify-center h-full text-gray-600">
-                <p>Zetoro Workspace</p>
+                <p>Workspace</p>
             </div>
         @endif
     </div>

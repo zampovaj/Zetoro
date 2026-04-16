@@ -1,39 +1,28 @@
-<div>
-    <flux:modal name="create-modal" class="min-w-[400px]">
+@props(['name', 'title', 'subtitle' => ''])
 
-        <form wire:submit="save" class="space-y-6">
+<flux:modal :name="$name" class="min-w-[400px]">
+    <form wire:submit="save" class="space-y-6">
 
-            {{-- Dynamic Headers based on the $type --}}
-            <div>
-                <flux:heading size="lg">
-                    Create New {{ ucfirst($type) }}
-                </flux:heading>
-                <flux:subheading>
-                    @if ($parentId)
-                        Adding to the selected folder.
-                    @else
-                        Adding to the root workspace.
-                    @endif
-                </flux:subheading>
-            </div>
+        <div>
+            <flux:heading size="lg">{{ $title }}</flux:heading>
+            @if ($subtitle)
+                <flux:subheading>{{ $subtitle }}</flux:subheading>
+            @endif
+        </div>
 
-            {{-- The Input Field --}}
-            <flux:input wire:model="name" label="{{ $type === 'article' ? 'Article Title' : 'Folder Name' }}"
-                placeholder="Enter name..." required />
+        <div class="space-y-4">
+            {{ $slot }}
+        </div>
 
-            {{-- Action Buttons --}}
-            <div class="flex justify-end gap-2">
-                <flux:button type="button" variant="ghost"
-                    x-on:click="$dispatch('modal-close', { name: 'create-modal' })">
-                    Cancel
-                </flux:button>
+        <div class="flex justify-end gap-2">
+            <flux:button type="button" variant="ghost" x-on:click="$dispatch('modal-close', { name: '{{ $name }}' })">
+                Cancel
+            </flux:button>
 
-                <flux:button type="submit" variant="primary">
-                    Create
-                </flux:button>
-            </div>
+            <flux:button type="submit" variant="primary">
+                Create
+            </flux:button>
+        </div>
 
-        </form>
-
-    </flux:modal>
-</div>
+    </form>
+</flux:modal>
