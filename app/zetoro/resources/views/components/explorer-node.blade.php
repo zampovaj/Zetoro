@@ -30,10 +30,11 @@
 @endphp
 
 <div x-data="{ expanded: false }" class="w-full text-sm select-none">
-    <div class="group flex items-center justify-between py-1 px-2 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-md cursor-pointer transition-colors"
+    <div class=" group flex items-center justify-between py-1 px-2 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-md cursor-pointer transition-colors"
+        style="padding-left: {{ $level * 8 }}px;"
         @if ($isExpandable && $hasChildren) @click="expanded = !expanded"
         @elseif ($type === 'file')
-            wire:dblclick='openFile("{{ $item->id }}")' @endif>
+            wire:dblclick='openFile("{{ $item->id }}", "{{ $item->name }}")' @endif>
 
         <div class="flex items-center gap-2 overflow-hidden">
             <div class="w-4 h-4 flex items-center justify-center">
@@ -73,35 +74,38 @@
 
     @if ($isExpandable && $hasChildren)
 
-        @if ($type === 'folder')
-            @foreach ($allFolders->where('parent_id', $item->id) as $folder)
-                @include('components.explorer-node', [
-                    'type' => 'folder',
-                    'item' => $folder,
-                    'allFolders' => $allFolders,
-                    'level' => $level + 1
-                ])
-            @endforeach
+        <div x-show="expanded" x-collapse>
 
-            @foreach ($item->articles as $article)
-                @include('components.explorer-node', [
-                    'type' => 'article',
-                    'item' => $article,
-                    'allFolders' => $allFolders,
-                    'level' => $level + 1
-                ])
-            @endforeach
+            @if ($type === 'folder')
+                @foreach ($allFolders->where('parent_id', $item->id) as $folder)
+                    @include('components.explorer-node', [
+                        'type' => 'folder',
+                        'item' => $folder,
+                        'allFolders' => $allFolders,
+                        'level' => $level + 1,
+                    ])
+                @endforeach
 
-        @elseif ($type === 'article')
-            @foreach ($item->files as $file)
-                @include('components.explorer-node', [
-                    'type' => 'file',
-                    'item' => $file,
-                    'allFolders' => $allFolders,
-                    'level' => $level + 1
-                ])
-            @endforeach
-        @endif
+                @foreach ($item->articles as $article)
+                    @include('components.explorer-node', [
+                        'type' => 'article',
+                        'item' => $article,
+                        'allFolders' => $allFolders,
+                        'level' => $level + 1,
+                    ])
+                @endforeach
+            @elseif ($type === 'article')
+                @foreach ($item->files as $file)
+                    @include('components.explorer-node', [
+                        'type' => 'file',
+                        'item' => $file,
+                        'allFolders' => $allFolders,
+                        'level' => $level + 1,
+                    ])
+                @endforeach
+            @endif
+
+        </div>
 
     @endif
 </div>

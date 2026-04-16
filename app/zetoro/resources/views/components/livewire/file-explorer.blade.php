@@ -79,10 +79,11 @@ new class extends Component {
         };
     }
 
-    public function openArticle(string $fileId, string $title): void
+    public function openFile(string $fileId, string $title): void
     {
         $this->dispatch('request-file-open', fileId: $fileId, title: $title);
     }
+
 }; ?>
 
 <div class="flex flex-col h-full">
