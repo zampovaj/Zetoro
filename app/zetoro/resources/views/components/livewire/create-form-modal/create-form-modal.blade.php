@@ -5,6 +5,7 @@
     @endphp
 
     <x-create-modal
+        :action="$mode"
         name="create-modal"
         :title="$modalTitle"
         :subtitle="$modalSubtitle">
