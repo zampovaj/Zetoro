@@ -31,7 +31,7 @@
 
 <div x-data="{ expanded: false }" class="w-full text-sm select-none">
     <div class=" group flex items-center justify-between py-1 px-2 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-md cursor-pointer transition-colors"
-        style="padding-left: {{ $level * 8 }}px;"
+        :style="{ paddingLeft: {{ $level * 8 }} + 'px' }"
         @if ($isExpandable && $hasChildren) @click="expanded = !expanded"
         @elseif ($type === 'file')
             wire:dblclick='openFile("{{ $item->id }}", "{{ $item->name }}")' @endif>
@@ -53,27 +53,35 @@
 
         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
 
-            <button wire:click.stop='triggerEdit("{{ $type }}", "{{ $item->id }}")'
-                class="p-1 text-zinc-400 hover:text-blue-500 rounded">
-                <flux:icon.pencil class="size-3" />
-            </button>
 
-            @if ($isExpandable)
-                @if ($type === 'article')
-                    <button wire:click.stop='triggerCreate("file", "{{ $item->id }}")'
-                        class="p-1 text-zinc-400 hover:text-green-500 rounded">
-                        <flux:icon.plus class="size-3" />
-                    </button>
-                @elseif ($type === 'folder')
-                    @component('create-dropdown', ['itemId' => $item->id])
-                    @endcomponent
-                @endif
+            <x-action-button
+                action="triggerEdit"
+                :type="$type"
+                :itemId="$item->id"
+                colorClass="text-zinc-400 hover:text-blue-500"
+                icon="pencil" >
+            </x-action-button>
+
+            @if ($type === 'article')
+                <x-action-button
+                    action="triggerCreate"
+                    type="file"
+                    :itemId="$item->id"
+                    colorClass="text-zinc-400 hover:text-green-500"
+                    icon="plus" >
+                </x-action-button>
+
+            @elseif ($type === 'folder')
+                <x-create-dropdown :itemId="$item->id" />
             @endif
 
-            <button wire:click.stop='triggerDelete("{{ $type }}", "{{ $item->id }}")'
-                class="p-1 text-zinc-400 hover:text-red-500 rounded">
-                <flux:icon.trash class="size-3" />
-            </button>
+            <x-action-button
+                action="triggerDelete"
+                :type="$type"
+                :itemId="$item->id"
+                colorClass="text-zinc-400 hover:text-red-500"
+                icon="trash" >
+            </x-action-button>
         </div>
     </div>
 
@@ -83,34 +91,34 @@
 
             @if ($type === 'folder')
                 @foreach ($allFolders->where('parent_id', $item->id) as $folder)
-                    @include('components.explorer-node', [
-                        'type' => 'folder',
-                        'item' => $folder,
-                        'allFolders' => $allFolders,
-                        'level' => $level + 1,
-                    ])
+                    <x-explorer-node
+                        type="folder"
+                        :item="$folder"
+                        :allFolders="$allFolders"
+                        :level="$level + 1" >
+                    </x-explorer-node>
                 @endforeach
 
                 @foreach ($item->articles as $article)
-                    @include('components.explorer-node', [
-                        'type' => 'article',
-                        'item' => $article,
-                        'allFolders' => $allFolders,
-                        'level' => $level + 1,
-                    ])
+                    <x-explorer-node
+                        type="article"
+                        :item="$article"
+                        :allFolders="$allFolders"
+                        :level="$level + 1" >
+                    </x-explorer-node>
                 @endforeach
+                
             @elseif ($type === 'article')
                 @foreach ($item->files as $file)
-                    @include('components.explorer-node', [
-                        'type' => 'file',
-                        'item' => $file,
-                        'allFolders' => $allFolders,
-                        'level' => $level + 1,
-                    ])
+                    <x-explorer-node
+                        type="file"
+                        :item="$file"
+                        :allFolders="$allFolders"
+                        :level="$level + 1" >
+                    </x-explorer-node>
                 @endforeach
             @endif
 
         </div>
-
     @endif
 </div>

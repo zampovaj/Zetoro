@@ -13,17 +13,19 @@
 
 <body class="min-h-screen bg-white dark:bg-zinc-900">
 
-    <flux:sidebar sticky stashable class="w-80 bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700">
+    <flux:sidebar sticky stashable
+        class="w-90 bg-zinc-50 dark:bg-zinc-900 border-r border
+    -zinc-200 dark:border-zinc-700">
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-        @livewire('livewire.file-explorer')
+        <livewire:livewire.file-explorer></livewire:livewire.file-explorer>
 
     </flux:sidebar>
 
     <flux:main class="p-0 flex flex-col h-screen overflow-hidden">
 
-        @livewire('livewire.workspace')
-        @livewire('livewire.create-form-modal')
+        <livewire:livewire.workspace></livewire:livewire.workspace>
+        <livewire:livewire.create-form-modal></livewire:livewire.create-form-modal>
 
     </flux:main>
     @livewireScripts

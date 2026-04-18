@@ -4,14 +4,12 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 
 new class extends Component {
-    // Stores arrays of ['id' => '...', 'title' => '...']
     public array $openTabs = [];
     public ?string $activeTabId = null;
 
     #[On('request-file-open')]
     public function handleFileOpen(string $fileId, string $title): void
     {
-        // Check if the tab is already open
         $exists = collect($this->openTabs)->contains('id', $fileId);
 
         if (!$exists) {
@@ -21,18 +19,16 @@ new class extends Component {
             ];
         }
 
-        // Switch focus to the requested tab
         $this->activeTabId = $fileId;
     }
 
     public function closeTab(string $fileId): void
     {
+        // filter to remove this id
         $this->openTabs = array_filter($this->openTabs, fn($tab) => $tab['id'] !== $fileId);
-
-        // Re-index array so standard loops work cleanly
+        // reindex cause it doent work otherwise
         $this->openTabs = array_values($this->openTabs);
-
-        // If we closed the active tab, switch to the last available tab, or null
+        // switch focus to last available tab or null
         if ($this->activeTabId === $fileId) {
             $this->activeTabId = count($this->openTabs) > 0 ? end($this->openTabs)['id'] : null;
         }

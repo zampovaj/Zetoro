@@ -16,13 +16,13 @@ class FileForm extends Form
 
     public function store(?string $parentId = null)
     {
+        $this->validate();
+
         $file = File::create([
             'article_id' => $parentId,
             'name' => $this->name,
             'path' => $this->path,
         ]);
-
-        $file->store();
 
         $this->reset();
     }

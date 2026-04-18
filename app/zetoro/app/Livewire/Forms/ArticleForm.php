@@ -34,6 +34,8 @@ class ArticleForm extends Form
 
     public function store(?string $parentId = null)
     {
+        $parentId = $parentId ?: null;
+
         $this->validate();
 
         $article = Article::create([
@@ -52,8 +54,6 @@ class ArticleForm extends Form
         if ($parentId) {
             $article->folders()->attach($parentId);
         }
-
-        $article->store();
 
         $this->reset();
     }

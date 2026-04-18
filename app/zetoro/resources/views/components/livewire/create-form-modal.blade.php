@@ -1,18 +1,22 @@
 <?php
 
-use Livewire\Component;
-use Livewire\Attributes\On;
 use App\Livewire\Forms\ArticleForm;
-use App\Livewire\Forms\FolderForm;
 use App\Livewire\Forms\FileForm;
+use App\Livewire\Forms\FolderForm;
 use Flux\Flux;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
-new class extends Component {
+new class extends Component
+{
     public ?string $type = null;
+
     public ?string $parentId = null;
 
     public ArticleForm $articleForm;
+
     public FolderForm $folderForm;
+
     public FileForm $fileForm;
 
     #[On('open-create-modal')]
@@ -46,11 +50,10 @@ new class extends Component {
         $modalSubtitle = $parentId ? 'Adding to the selected folder.' : 'Adding to the root workspace.';
     @endphp
 
-    @component('components.create-modal', [
-        'name' => 'create-modal',
-        'title' => $modalTitle,
-        'subtitle' => $modalSubtitle,
-    ])
+    <x-create-modal
+        name="create-modal"
+        :title="$modalTitle"
+        :subtitle="$modalSubtitle">
 
         @if ($type === 'article')
             <flux:input wire:model="articleForm.title" label="Title" required />
@@ -60,14 +63,16 @@ new class extends Component {
                 <flux:input wire:model="articleForm.doi" label="DOI" class="flex-1" />
                 <flux:input wire:model="articleForm.year" label="Year" type="number" class="w-32" />
             </div>
+
         @elseif($type === 'folder')
             <flux:input wire:model="folderForm.name" label="Folder Name" required />
+
         @elseif($type === 'file')
             <flux:input wire:model="fileForm.name" label="File Name" required />
             <div class="border-2 border-dashed border-zinc-300 p-8 text-center rounded-md text-zinc-500">
                 Drag and drop PDF here
             </div>
         @endif
-
-    @endcomponent
+        
+    </x-create-modal>
 </div>

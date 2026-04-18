@@ -11,7 +11,6 @@ new class extends Component {
     public Collection $rootFolders;
     public Collection $orphanArticles;
 
-    // TODO: use mount not boot, boot only for mock
     // public function mount(): void
     // {
     //     $this->loadData();
@@ -73,11 +72,13 @@ new class extends Component {
 
     public function triggerEdit(string $type, $itemId): void {}
 
-    public function triggerCreate(string $type, $itemId): void {
+    public function triggerCreate(string $type, $itemId): void
+    {
         $this->dispatch('open-create-modal', type: $type, parentId: $itemId);
     }
 
-    public function triggerDelete(string $type, $itemId): void {
+    public function triggerDelete(string $type, $itemId): void
+    {
         match ($type) {
             'folder' => Folder::destroy($itemId),
             'article' => Article::destroy($itemId),
@@ -89,7 +90,6 @@ new class extends Component {
     {
         $this->dispatch('request-file-open', fileId: $fileId, title: $title);
     }
-
 }; ?>
 
 <div class="flex flex-col h-full">
@@ -97,32 +97,19 @@ new class extends Component {
         class="py-3 border-b border-gray-700 flex justify-between items-center text-sm font-semibold uppercase tracking-wider text-gray-400">
         <span>Explorer</span>
 
-        @component('create-dropdown', ['itemId' => null])
-        @endcomponent
-        <!-- <button class="hover:text-white px-3 text-xl" title="New Folder" wire:click='triggerCreate("folder", null)'>+</button> -->
+        <x-create-dropdown :itemId="null" />
+
     </div>
 
     <div class="flex-1 overflow-y-auto py-2">
         <ul class="space-y-1">
 
             @foreach ($rootFolders as $rootFolder)
-                @component('explorer-node', [
-                    'type' => 'folder',
-                    'item' => $rootFolder,
-                    'allFolders' => $this->allFolders,
-                    'level' => 0,
-                ]);
-                @endcomponent
+                <x-explorer-node type="folder" :item="$rootFolder" :allFolders="$this->allFolders" :level="0" />
             @endforeach
 
             @foreach ($orphanArticles as $article)
-                @component('explorer-node', [
-                    'type' => 'article',
-                    'item' => $article,
-                    'allFolders' => $this->allFolders,
-                    'level' => 0,
-                ]);
-                @endcomponent
+                <x-explorer-node type="article" :item="$article" :allFolders="$this->allFolders" :level="0" />
             @endforeach
         </ul>
     </div>

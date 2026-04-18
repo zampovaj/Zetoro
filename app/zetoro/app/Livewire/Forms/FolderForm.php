@@ -13,11 +13,15 @@ class FolderForm extends Form
 
     public function store(?string $parentId = null)
     {
+        $parentId = $parentId ?: null;
+
+        $this->validate();
+
         $folder = Folder::create([
             'parent_id' => $parentId,
             'name' => $this->name,
         ]);
 
-        $folder->store();
+        $this->reset();
     }
 }
