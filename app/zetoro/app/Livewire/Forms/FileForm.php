@@ -14,7 +14,7 @@ class FileForm extends Form
     #[Validate('required|string|min:1')]
     public string $path = '';
 
-    public function store(?string $parentId = null)
+    public function store(?string $parentId = null): File
     {
         $this->validate();
 
@@ -25,5 +25,7 @@ class FileForm extends Form
         ]);
 
         $this->reset();
+
+        return $file;
     }
 }

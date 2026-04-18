@@ -53,7 +53,6 @@
 
         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
 
-
             <x-action-button
                 action="triggerEdit"
                 :type="$type"
@@ -107,7 +106,7 @@
                         :level="$level + 1" >
                     </x-explorer-node>
                 @endforeach
-                
+
             @elseif ($type === 'article')
                 @foreach ($item->files as $file)
                     <x-explorer-node

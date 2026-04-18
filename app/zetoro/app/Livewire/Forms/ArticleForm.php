@@ -32,7 +32,7 @@ class ArticleForm extends Form
     #[Validate('nullable|array')]
     public array $citations = [];
 
-    public function store(?string $parentId = null)
+    public function store(?string $parentId = null): Article
     {
         $parentId = $parentId ?: null;
 
@@ -56,5 +56,7 @@ class ArticleForm extends Form
         }
 
         $this->reset();
+
+        return $article;
     }
 }

@@ -1,12 +1,3 @@
-<?php
-
-use Livewire\Component;
-
-new class extends Component {
-    //
-};
-?>
-
 <div>
     <div id="pdf-container" class="relative w-full max-w-3xl mx-auto bg-gray-100 overflow-hidden">
         <canvas id="pdf-canvas" class="bg-white block mx-auto"></canvas>

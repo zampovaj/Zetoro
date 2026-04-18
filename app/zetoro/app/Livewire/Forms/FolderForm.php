@@ -11,7 +11,7 @@ class FolderForm extends Form
     #[Validate('required|string|min:1')]
     public string $name = '';
 
-    public function store(?string $parentId = null)
+    public function store(?string $parentId = null): Folder
     {
         $parentId = $parentId ?: null;
 
@@ -23,5 +23,7 @@ class FolderForm extends Form
         ]);
 
         $this->reset();
+
+        return $folder;
     }
 }

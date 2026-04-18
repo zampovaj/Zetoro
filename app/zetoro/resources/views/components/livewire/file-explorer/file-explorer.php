@@ -1,25 +1,29 @@
 <?php
 
-use Livewire\Component;
 use App\Models\Article;
-use App\Models\Folder;
 use App\Models\File;
+use App\Models\Folder;
 use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
-new class extends Component {
+new class extends Component
+{
     public Collection $allFolders;
+
     public Collection $rootFolders;
+
     public Collection $orphanArticles;
 
-    // public function mount(): void
-    // {
-    //     $this->loadData();
-    // }
-
-    public function boot(): void
+    public function mount(): void
     {
-        $this->mockData();
+        $this->loadData();
     }
+
+    // public function boot(): void
+    // {
+    //     $this->mockData();
+    // }
 
     private function loadData(): void
     {
@@ -57,7 +61,7 @@ new class extends Component {
         $folder1->setRelation('articles', new Collection([$article1]));
 
         $folder2 = (new Folder)->forceFill(['id' => 'dir2', 'name' => 'Computer Science', 'parent_id' => null]);
-        $folder2->setRelation('articles', new Collection());
+        $folder2->setRelation('articles', new Collection);
 
         $folder3 = (new Folder)->forceFill(['id' => 'dir3', 'name' => 'Cryptography', 'parent_id' => 'dir2']);
         $folder3->setRelation('articles', new Collection([$article2]));
@@ -90,27 +94,31 @@ new class extends Component {
     {
         $this->dispatch('request-file-open', fileId: $fileId, title: $title);
     }
-}; ?>
 
-<div class="flex flex-col h-full">
-    <div
-        class="py-3 border-b border-gray-700 flex justify-between items-center text-sm font-semibold uppercase tracking-wider text-gray-400">
-        <span>Explorer</span>
+    #[On('item-created')]
+    public function handleItemCreated(string $type, string $itemId)
+    {
+        if ($type === 'folder') {
+            $newFolder = Folder::with('articles.files')->find($itemId);
 
-        <x-create-dropdown :itemId="null" />
+            $this->allFolders->push($newFolder);
 
-    </div>
+            if (is_null($newFolder->parent_id)) {
+                $this->rootFolders->push($newFolder);
+            }
+        } elseif ($type === 'article') {
+            $newArticle = Article::with('files')->find($itemId);
 
-    <div class="flex-1 overflow-y-auto py-2">
-        <ul class="space-y-1">
-
-            @foreach ($rootFolders as $rootFolder)
-                <x-explorer-node type="folder" :item="$rootFolder" :allFolders="$this->allFolders" :level="0" />
-            @endforeach
-
-            @foreach ($orphanArticles as $article)
-                <x-explorer-node type="article" :item="$article" :allFolders="$this->allFolders" :level="0" />
-            @endforeach
-        </ul>
-    </div>
-</div>
+            if (is_null($newArticle->parent_id)) {
+                $this->orphanArticles->push($newArticle);
+            } else {
+                // its actually cheaper to reload then search inside the tree
+                $this->loadData();
+            }
+        } elseif ($type === 'file') {
+            $this->loadData();
+        } else {
+            $this->loadData();
+        }
+    }
+};
