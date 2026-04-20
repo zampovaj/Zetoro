@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class File extends Model
 {
@@ -18,23 +17,9 @@ class File extends Model
         'path',
     ];
 
-    public function path(): Attribute
+    public function getAbsolutePath(): string
     {
-        return Attribute::make(
-            get: function (string $value) {
-                // backward slash is like a special character so it need to type it twice (i dont get it but it works)
-                $basePath = rtrim(config('filesystems.pdf_storage_base_path'), '/\\');
-                $relativePath = ltrim($value, '/\\');
-
-                return $basePath.DIRECTORY_SEPARATOR.$relativePath;
-            },
-            set: function (string $value) {
-                $basePath = rtrim(config('filesystems.pdf_storage_base_path'), '/\\');
-                $cleanedPath = Str::after($value, $basePath);
-
-                return ltrim($cleanedPath, '/\\');
-            }
-        );
+        return Storage::disk('pdf_vault')->path($this->path);
     }
 
     public function article(): BelongsTo

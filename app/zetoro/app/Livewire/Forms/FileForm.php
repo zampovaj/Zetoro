@@ -3,6 +3,8 @@
 namespace App\Livewire\Forms;
 
 use App\Models\File;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -13,24 +15,28 @@ class FileForm extends Form
     #[Validate('nullable|string|min:1')]
     public string $name = 'article';
 
-    #[Validate('required|string|min:1')]
-    public string $path = '';
+    #[Validate('required|file|mimes:pdf|max:51200')]
+    public ?UploadedFile $uploadFile = null;
 
     public function setFile(File $file)
     {
         $this->file = $file;
         $this->name = $file->name;
-        $this->path = $file->path;
     }
 
     public function store(?string $parentId = null): File
     {
         $this->validate();
 
+        $folderName = Str::random(16);
+        $safeFileName = Str::slug($this->name ?? 'article') . '.pdf';
+
+        $relativePath = $this->uploadFile->storeAs($folderName, $safeFileName, 'pdf_vault');
+
         $file = File::create([
             'article_id' => $parentId,
             'name' => $this->name,
-            'path' => $this->path,
+            'path' => $relativePath,
         ]);
 
         $this->reset();
@@ -38,19 +44,19 @@ class FileForm extends Form
         return $file;
     }
 
-    public function update(): File
-    {
-        $this->validate();
+    // public function update(): File
+    // {
+    //     $this->validate();
 
-        $this->file->update([
-            'name' => $this->name,
-            'path' => $this->path,
-        ]);
+    //     $this->file->update([
+    //         'name' => $this->name,
+    //         'path' => $this->path,
+    //     ]);
 
-        $file = $this->file;
+    //     $file = $this->file;
 
-        $this->reset();
+    //     $this->reset();
 
-        return $file;
-    }
+    //     return $file;
+    // }
 }

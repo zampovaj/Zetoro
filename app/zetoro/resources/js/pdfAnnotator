@@ -130,7 +130,7 @@ class PDFAnnotator {
                     for (let i = 0; i < annotation.quadPoints.length; i += 8) {
                         const quad = annotation.quadPoints.slice(i, i + 8);
 
-                        // transforming wuad points into a viewport rectangle
+                        // transforming quad points into a viewport rectangle
                         const rect = [
                             quad[0], // x min - bottom-left (x)
                             quad[1], // y min - bottom-left (y)

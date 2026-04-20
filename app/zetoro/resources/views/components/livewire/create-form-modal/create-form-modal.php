@@ -9,21 +9,19 @@ use App\Models\Folder;
 use Flux\Flux;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component
 {
+    use WithFileUploads;
+
     public ?string $type = null;
-
     public ?string $parentId = null;
-
     public ?string $editItemId = null; // for update tracking
-
     public string $mode = 'create'; // create / edit
 
     public ArticleForm $articleForm;
-
     public FolderForm $folderForm;
-
     public FileForm $fileForm;
 
     #[On('open-create-modal')]
@@ -70,7 +68,7 @@ new class extends Component
             $item = match ($this->type) {
                 'article' => $this->articleForm->update(),
                 'folder' => $this->folderForm->update(),
-                'file' => $this->fileForm->update(),
+                // 'file' => $this->fileForm->update(),
             };
         }
 

@@ -35,7 +35,7 @@ services:
       - ./app/zetoro/.env.production
     volumes:
       # The Bridge: Maps the host path to the internal container path
-      - "${PDF_STORAGE_BASE_PATH}:/var/www/html/storage/app/pdf_vault"
+      - "${PDF_STORAGE_HOST_PATH}:${PDF_STORAGE_INTERNAL_PATH}"
     depends_on:
       migrator:
         condition: service_completed_successfully
@@ -64,7 +64,7 @@ services:
       - pg-data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
       interval: 2s
       timeout: 5s
       retries: 10

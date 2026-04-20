@@ -60,6 +60,12 @@ return [
             'report' => false,
         ],
 
+        'pdf_vault' => [
+            'driver' => 'local',
+            'root' => env('PDF_STORAGE_INTERNAL_PATH', storage_path('app/pdf_vault')),
+            'throw' => false,
+        ],
+
     ],
 
     /*

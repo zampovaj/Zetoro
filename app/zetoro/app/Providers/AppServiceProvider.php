@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use App\Contracts\IMetadataExtractor;
+use App\Models\Article;
+use App\Models\File;
+use App\Observers\ArticleObserver;
+use App\Observers\FileObserver;
 use App\Services\Metadata\DummyZoteroExtractor;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -26,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        File::observe(FileObserver::class);
+        Article::observe(ArticleObserver::class);
     }
 
     /**
