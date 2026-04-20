@@ -67,7 +67,7 @@ new class extends Component
         } elseif ($type === 'article') {
             $newArticle = Article::with('files')->find($itemId);
 
-            if (is_null($newArticle->parent_id)) {
+            if ($newArticle->folders()->count() == 0) {
                 $this->orphanArticles->push($newArticle);
             } else {
                 // its actually cheaper to reload then search inside the tree
