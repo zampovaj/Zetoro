@@ -30,8 +30,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
-        File::observe(FileObserver::class);
-        Article::observe(ArticleObserver::class);
     }
 
     /**
