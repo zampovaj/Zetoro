@@ -39,6 +39,12 @@ new class extends Component
 
     public function triggerDelete(string $type, $itemId): void
     {
+        $idsToRemove = match ($type) {
+            'file'    => [$itemId],
+            'article' => File::whereArticleId($itemId)->pluck('id')->toArray(),
+            'folder'  => [],
+            default   => [],
+        };
         match ($type) {
             'folder' => Folder::destroy($itemId),
             'article' => Article::destroy($itemId),
@@ -46,6 +52,7 @@ new class extends Component
         };
 
         $this->loadData();
+        $this->dispatch('item-deleted', fileIds: $idsToRemove);
     }
 
     public function openFile(string $fileId, string $title): void

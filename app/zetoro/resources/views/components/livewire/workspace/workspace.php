@@ -1,10 +1,12 @@
 <?php
 
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
-new class extends Component {
+new class extends Component
+{
     public array $openTabs = [];
+
     public ?string $activeTabId = null;
 
     #[On('request-file-open')]
@@ -12,7 +14,7 @@ new class extends Component {
     {
         $exists = collect($this->openTabs)->contains('id', $fileId);
 
-        if (!$exists) {
+        if (! $exists) {
             $this->openTabs[] = [
                 'id' => $fileId,
                 'title' => $title,
@@ -22,10 +24,18 @@ new class extends Component {
         $this->activeTabId = $fileId;
     }
 
+    #[On('item-deleted')]
+    public function removeFile($fileIds)
+    {
+        foreach ($fileIds as $fileId) {
+            $this->closeTab($fileId);
+        }
+    }
+
     public function closeTab(string $fileId): void
     {
         // filter to remove this id
-        $this->openTabs = array_filter($this->openTabs, fn($tab) => $tab['id'] !== $fileId);
+        $this->openTabs = array_filter($this->openTabs, fn ($tab) => $tab['id'] !== $fileId);
         // reindex cause it doent work otherwise
         $this->openTabs = array_values($this->openTabs);
         // switch focus to last available tab or null
@@ -38,4 +48,4 @@ new class extends Component {
     {
         $this->activeTabId = $fileId;
     }
-}; 
+};

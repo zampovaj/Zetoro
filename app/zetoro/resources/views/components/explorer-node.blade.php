@@ -34,7 +34,7 @@
         :style="{ paddingLeft: {{ $level * 8 }} + 'px' }"
         @if ($isExpandable && $hasChildren) @click="expanded = !expanded"
         @elseif ($type === 'file')
-            wire:dblclick='openFile("{{ $item->id }}", "{{ $item->name }}")' @endif>
+            wire:click='openFile("{{ $item->id }}", "{{ $item->name }}")' @endif>
 
         <div class="flex items-center gap-2 overflow-hidden">
             <div class="w-4 h-4 flex items-center justify-center">

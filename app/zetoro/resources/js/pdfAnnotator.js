@@ -24,6 +24,7 @@ class PDFAnnotator {
     async init() {
         try {
             const pdf = await pdfjsLib.getDocument(this.pdfUrl).promise;
+
             const page = await pdf.getPage(2);
 
             const unscaledViewport = page.getViewport({ scale: 1.0 });
