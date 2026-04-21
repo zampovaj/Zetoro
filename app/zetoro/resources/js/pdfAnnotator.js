@@ -6,13 +6,13 @@ import * as pdfjsViewer from 'pdfjs-dist/legacy/web/pdf_viewer.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 class PDFAnnotator {
-    constructor(pdfUrl, containerId) {
+    constructor(pdfUrl, containerId, canvasId, textLayerId, annotationLayerId) {
         this.pdfUrl = pdfUrl;
         this.container = document.getElementById(containerId);
-        this.canvas = document.getElementById('pdf-canvas');
+        this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
-        this.textLayerDiv = document.getElementById('text-layer');
-        this.annotationLayerDiv = document.getElementById('annotation-layer');
+        this.textLayerDiv = document.getElementById(textLayerId);
+        this.annotationLayerDiv = document.getElementById(annotationLayerId);
 
         this.viewport = null;
         this.scale = 1;
@@ -233,6 +233,5 @@ class PDFAnnotator {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    new PDFAnnotator('/sample.pdf', 'pdf-container');
-});
+window.PDFAnnotator = PDFAnnotator;
+window.dispatchEvent(new CustomEvent('pdf-annotator-ready'));
