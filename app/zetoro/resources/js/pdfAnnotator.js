@@ -6,16 +6,9 @@ import * as pdfjsViewer from 'pdfjs-dist/legacy/web/pdf_viewer.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 class PDFAnnotator {
-    constructor(pdfUrl, containerId, canvasId, textLayerId, annotationLayerId) {
+    constructor(pdfUrl, containerId) {
         this.pdfUrl = pdfUrl;
         this.container = document.getElementById(containerId);
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.textLayerDiv = document.getElementById(textLayerId);
-        this.annotationLayerDiv = document.getElementById(annotationLayerId);
-
-        this.viewport = null;
-        this.scale = 1;
 
         this.init();
         this.bindEvents();
@@ -25,39 +18,73 @@ class PDFAnnotator {
         try {
             const pdf = await pdfjsLib.getDocument(this.pdfUrl).promise;
 
-            const page = await pdf.getPage(2);
+            for (let i = 1; i < pdf.numPages; i++) {
+                await this.renderPage(pdf, i);
+            }
 
-            const unscaledViewport = page.getViewport({ scale: 1.0 });
-            this.scale = this.container.clientWidth / unscaledViewport.width;
-            this.viewport = page.getViewport({ scale: this.scale });
-
-            const outputScale = window.devicePixelRatio || 1;
-            this.canvas.width = Math.floor(this.viewport.width * outputScale);
-            this.canvas.height = Math.floor(this.viewport.height * outputScale);
-            this.canvas.style.width = `${Math.floor(this.viewport.width)}px`;
-            this.canvas.style.height = `${Math.floor(this.viewport.height)}px`;
-
-            this.alignLayers();
-
-            const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
-            await page.render({
-                canvasContext: this.ctx,
-                transform: transform,
-                viewport: this.viewport
-            }).promise;
-
-            await this.renderTextLayer(page);
-            this.renderHighlightAnnotations(page);
 
         } catch (error) {
             console.error("Error loading PDF:", error);
         }
     }
 
-    async renderTextLayer(page) {
-        this.textLayerDiv.innerHTML = '';
+    async renderPage(pdf, pageNumber) {
+        const page = await pdf.getPage(pageNumber);
+        const unscaledViewport = page.getViewport({ scale: 1.0 });
 
+        this.container.style.height = '100%';
+
+        let containerWidth = this.container.clientWidth - 32; // 32 for padding
+        if (containerWidth <= 0) containerWidth = 736; // fallback width
+
+        const scale = containerWidth / unscaledViewport.width;
+        const viewport = page.getViewport({ scale: scale });
+
+        // page
+        const pageDiv = document.createElement('div');
+        pageDiv.className = 'pdf-page-wrapper relative mx-auto mb-6 bg-white shadow-lg';
+        pageDiv.style.width = `${Math.floor(viewport.width)}px`;
+        pageDiv.style.height = `${Math.floor(viewport.height)}px`;
+
+        // canvas
+        const canvas = document.createElement('canvas');
+        canvas.className = 'block';
+        const ctx = canvas.getContext('2d');
+        const outputScale = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(viewport.width * outputScale);
+        canvas.height = Math.floor(viewport.height * outputScale);
+        canvas.style.width = `${Math.floor(viewport.width)}px`;
+        canvas.style.height = `${Math.floor(viewport.height)}px`;
+        pageDiv.appendChild(canvas);
+
+        // text layer
+        const textLayerDiv = document.createElement('div');
+        textLayerDiv.className = 'textLayer absolute top-0 left-0 w-full h-full';
+        textLayerDiv.style.setProperty('--scale-factor', scale);
+        pageDiv.appendChild(textLayerDiv);
+
+        // anotation layer
+        const annotationLayerDiv = document.createElement('div');
+        annotationLayerDiv.className = 'custom-annotation-layer absolute top-0 left-0 w-full h-full pointer-events-none';
+        pageDiv.appendChild(annotationLayerDiv);
+
+        this.container.appendChild(pageDiv);
+
+        // this.alignLayers();
+
+        const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+
+        await page.render({
+            canvasContext: ctx,
+            transform: transform,
+            viewport: viewport
+        }).promise;
+
+        await this.renderTextLayer(page, textLayerDiv, viewport);
+        await this.renderHighlightAnnotations(page, annotationLayerDiv, viewport);
+    }
+
+    async renderTextLayer(page, textLayerDiv, viewport) {
         if (pdfjsLib.TextLayer) {
             try {
                 const source = typeof page.streamTextContent === 'function'
@@ -66,8 +93,8 @@ class PDFAnnotator {
 
                 const textLayer = new pdfjsLib.TextLayer({
                     textContentSource: source,
-                    container: this.textLayerDiv,
-                    viewport: this.viewport
+                    container: textLayerDiv,
+                    viewport: viewport
                 });
 
                 await textLayer.render();
@@ -83,9 +110,9 @@ class PDFAnnotator {
         if (TextLayerBuilder && EventBus) {
             const eventBus = new EventBus();
             const textLayerBuilder = new TextLayerBuilder({
-                textLayerDiv: this.textLayerDiv,
+                textLayerDiv: textLayerDiv,
                 pageIndex: page.pageIndex,
-                viewport: this.viewport,
+                viewport: viewport,
                 eventBus: eventBus
             });
 
@@ -95,26 +122,26 @@ class PDFAnnotator {
                 textLayerBuilder.textContentSource = page;
             }
 
-            textLayerBuilder.render(this.viewport);
+            textLayerBuilder.render(viewport);
         }
     }
 
-    alignLayers() {
-        const canvasLeft = this.canvas.offsetLeft;
-        const width = Math.floor(this.viewport.width);
-        const height = Math.floor(this.viewport.height);
+    // alignLayers() {
+    //     const canvasLeft = this.canvas.offsetLeft;
+    //     const width = Math.floor(this.viewport.width);
+    //     const height = Math.floor(this.viewport.height);
 
-        [this.textLayerDiv, this.annotationLayerDiv].forEach(layer => {
-            layer.style.width = `${width}px`;
-            layer.style.height = `${height}px`;
-            layer.style.left = `${canvasLeft}px`;
-            layer.style.top = '0px';
-        });
+    //     [this.textLayerDiv, this.annotationLayerDiv].forEach(layer => {
+    //         layer.style.width = `${width}px`;
+    //         layer.style.height = `${height}px`;
+    //         layer.style.left = `${canvasLeft}px`;
+    //         layer.style.top = '0px';
+    //     });
 
-        this.textLayerDiv.style.setProperty('--scale-factor', this.scale);
-    }
+    //     this.textLayerDiv.style.setProperty('--scale-factor', this.scale);
+    // }
 
-    async renderHighlightAnnotations(page) {
+    async renderHighlightAnnotations(page, annotationLayerDiv, viewport) {
         const annotations = await page.getAnnotations();
 
         annotations.forEach(annotation => {
@@ -139,18 +166,18 @@ class PDFAnnotator {
                             quad[5]  // y max - top-left (y)
                         ];
 
-                        const vRect = this.viewport.convertToViewportRectangle(rect);
+                        const vRect = viewport.convertToViewportRectangle(rect);
                         this.addHighlightToDOM(vRect);
                     }
                 } else {
-                    const vRect = this.viewport.convertToViewportRectangle(annotation.rect);
-                    this.addHighlightToDOM(vRect);
+                    const vRect = viewport.convertToViewportRectangle(annotation.rect);
+                    this.addHighlightToDOM(vRect, annotationLayerDiv);
                 }
             }
         });
     }
 
-    addHighlightToDOM(vRect) {
+    addHighlightToDOM(vRect, annotationLayerDiv) {
         const highlight = document.createElement("div");
         highlight.style.position = "absolute";
         highlight.style.left = `${Math.min(vRect[0], vRect[2])}px`;
@@ -159,16 +186,25 @@ class PDFAnnotator {
         highlight.style.height = `${Math.abs(vRect[1] - vRect[3])}px`;
         highlight.style.backgroundColor = "rgba(255, 255, 0, 0.5)";
         highlight.style.pointerEvents = "none";
-        this.annotationLayerDiv.appendChild(highlight);
+        annotationLayerDiv.appendChild(highlight);
     }
 
     bindEvents() {
-        document.addEventListener("mouseup", () => {
+        this.container.addEventListener("mouseup", () => {
             const sel = window.getSelection();
-            if (!sel.toString() || !this.viewport) return;
+            if (!sel.toString() || sel.rangeCount === 0) return;
 
             const range = sel.getRangeAt(0);
-            const containerRect = this.annotationLayerDiv.getBoundingClientRect();
+
+            // page
+            let node = range.commonAncestorContainer;
+            if (node.nodeType === 3) node = node.parentNode;
+            const pageContainer = node.closest('.pdf-page-wrapper');
+            if (!pageContainer) return;
+
+            // page specific annotation layer
+            const annotationLayerDiv = pageContainer.querySelector('.custom-annotation-layer');
+            const containerRect = annotationLayerDiv.getBoundingClientRect();
 
             // get all rectangles and treat them as an array
             const rawRects = Array.from(range.getClientRects());
@@ -191,11 +227,11 @@ class PDFAnnotator {
                 highlightGroup.appendChild(div);
             });
 
-            this.annotationLayerDiv.appendChild(highlightGroup);
+            annotationLayerDiv.appendChild(highlightGroup);
         });
     }
 
-    // need to have this one to reomve duplications and create nice lines
+    // need to have this one to remove duplications and create nice lines
     mergeRectangles(rects) {
         if (rects.length === 0) return [];
 
