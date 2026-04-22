@@ -45,10 +45,11 @@ namespace App\Models{
 /**
  * @property string $id
  * @property mixed $metadata
- * @property string $url
+ * @property string|null $url
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read Article|null $article
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $files
+ * @property-read int|null $files_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Folder> $folders
  * @property-read int|null $folders_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Article newModelQuery()
@@ -66,13 +67,16 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
+ * @property string $article_id
  * @property string $name
  * @property string $path
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\Article $article
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereArticleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereName($value)
@@ -106,10 +110,20 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property string|null $last_active_folder_id
+ * @property string $default_highlight_color
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
  * @property-read \App\Models\Folder|null $folder
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereDefaultHighlightColor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereLastActiveFolderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Settings whereUpdatedAt($value)
  */
 	class Settings extends \Eloquent {}
 }

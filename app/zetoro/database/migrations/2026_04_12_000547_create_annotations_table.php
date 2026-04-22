@@ -13,12 +13,10 @@ return new class extends Migration
     {
         Schema::create('annotations', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->foreignUlid('article_id')->constrained()->cascadeOnDelete();
-            $table->float('x_min');
-            $table->float('y_min');
-            $table->float('x_max');
-            $table->float('y_max');
-            $table->string('highlight_color')->nullable(); // if null -> no highlight
+            $table->foreignUlid('file_id')->constrained()->cascadeOnDelete();
+            $table->jsonb('rectangles'); // array of rectangles
+            $table->integer('page');
+            $table->string('highlight_color')->default('#FFFF0080');
             $table->string('note')->nullable(); // if null -> no note
             
             $table->timestamps();

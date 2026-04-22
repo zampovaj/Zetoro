@@ -43,6 +43,7 @@ class PDFAnnotator {
         // page
         const pageDiv = document.createElement('div');
         pageDiv.className = 'pdf-page-wrapper relative mx-auto mb-6 bg-white shadow-lg';
+        pageDiv.dataset.pageNumber = pageNumber;
         pageDiv.style.width = `${Math.floor(viewport.width)}px`;
         pageDiv.style.height = `${Math.floor(viewport.height)}px`;
 
@@ -100,7 +101,7 @@ class PDFAnnotator {
                 await textLayer.render();
                 return;
             } catch (err) {
-                console.warn("Core TextLayer initialization failed, checking Builder fallback...", err);
+                console.warn("TextLayer initialization failed.", err);
             }
         }
 
@@ -167,7 +168,7 @@ class PDFAnnotator {
                         ];
 
                         const vRect = viewport.convertToViewportRectangle(rect);
-                        this.addHighlightToDOM(vRect);
+                        this.addHighlightToDOM(vRect, annotationLayerDiv);
                     }
                 } else {
                     const vRect = viewport.convertToViewportRectangle(annotation.rect);
@@ -190,7 +191,7 @@ class PDFAnnotator {
     }
 
     bindEvents() {
-        this.container.addEventListener("mouseup", () => {
+        this.container.addEventListener('mouseup', (e) => {
             const sel = window.getSelection();
             if (!sel.toString() || sel.rangeCount === 0) return;
 
@@ -212,24 +213,84 @@ class PDFAnnotator {
             // turn them into lines
             const mergedRects = this.mergeRectangles(rawRects);
 
-            const highlightGroup = document.createElement("div");
-            highlightGroup.className = "highlight-group";
+            // create an array of rectangles
+            const finalRects = mergedRects.map(rect => {
+                const left = rect.left - containerRect.left;
+                const top = rect.top - containerRect.top;
 
-            mergedRects.forEach(rect => {
-                const div = document.createElement("div");
-                div.style.position = "absolute";
-                div.style.left = `${rect.left - containerRect.left}px`;
-                div.style.top = `${rect.top - containerRect.top}px`;
-                div.style.width = `${rect.width}px`;
-                div.style.height = `${rect.height}px`;
-                div.style.background = "rgba(255, 255, 0, 0.4)";
-                div.style.pointerEvents = "none";
-                highlightGroup.appendChild(div);
+                return {
+                    x_min: left,
+                    y_min: top,
+                    x_max: left + rect.width,
+                    y_max: top + rect.height
+                };
             });
 
-            annotationLayerDiv.appendChild(highlightGroup);
-        });
+            console.log(pageContainer.dataset.pageNumber);
+
+            const payload = {
+                page: parseInt(pageContainer.dataset.pageNumber || 1),
+                rectangles: finalRects
+            }
+
+            window.dispatchEvent(new CustomEvent('pdf-text-selected', {
+                detail: {
+                    payload: payload,
+                    mouseX: e.clientX,
+                    mouseY: e.clientY
+                }
+            }));
+
+            // hide dropdown
+            this.container.addEventListener("mousedown", () => {
+                if (window.getSelection().toString() === "") {
+                    window.dispatchEvent(new CustomEvent('pdf-click-away'));
+                }
+            });
+        })
     }
+
+    // bindEvents() {
+    //     this.container.addEventListener("mouseup", () => {
+    //         const sel = window.getSelection();
+    //         if (!sel.toString() || sel.rangeCount === 0) return;
+
+    //         const range = sel.getRangeAt(0);
+
+    //         // page
+    //         let node = range.commonAncestorContainer;
+    //         if (node.nodeType === 3) node = node.parentNode;
+    //         const pageContainer = node.closest('.pdf-page-wrapper');
+    //         if (!pageContainer) return;
+
+    //         // page specific annotation layer
+    //         const annotationLayerDiv = pageContainer.querySelector('.custom-annotation-layer');
+    //         const containerRect = annotationLayerDiv.getBoundingClientRect();
+
+    //         // get all rectangles and treat them as an array
+    //         const rawRects = Array.from(range.getClientRects());
+
+    //         // turn them into lines
+    //         const mergedRects = this.mergeRectangles(rawRects);
+
+    //         const highlightGroup = document.createElement("div");
+    //         highlightGroup.className = "highlight-group";
+
+    //         mergedRects.forEach(rect => {
+    //             const div = document.createElement("div");
+    //             div.style.position = "absolute";
+    //             div.style.left = `${rect.left - containerRect.left}px`;
+    //             div.style.top = `${rect.top - containerRect.top}px`;
+    //             div.style.width = `${rect.width}px`;
+    //             div.style.height = `${rect.height}px`;
+    //             div.style.background = "rgba(255, 255, 0, 0.4)";
+    //             div.style.pointerEvents = "none";
+    //             highlightGroup.appendChild(div);
+    //         });
+
+    //         annotationLayerDiv.appendChild(highlightGroup);
+    //     });
+    // }
 
     // need to have this one to remove duplications and create nice lines
     mergeRectangles(rects) {

@@ -4,24 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Annotation extends Model
 {
     use HasUlids;
 
     protected $fillable = [
-        'article_id',
-        'x_min',
-        'y_min',
-        'x_max',
-        'y_max',
+        'file_id',
+        'rectangles',
+        'page',
         'highlight_color',
         'note',
     ];
 
-    public function article(): HasOne
+    protected $casts = [
+        'rectangles' => 'array',
+    ];
+
+    public function file(): BelongsTo
     {
-        return $this->hasOne(Article::class);
+        return $this->belongsTo(File::class);
     }
 }
