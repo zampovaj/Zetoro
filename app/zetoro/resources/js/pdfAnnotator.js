@@ -23,7 +23,7 @@ class PDFAnnotator {
                 await this.renderPage(pdf, i);
             }
 
-            if(this.existingAnnotations.length > 0) {
+            if (this.existingAnnotations.length > 0) {
                 this.existingAnnotations.forEach(annotation => {
                     this.drawDatabaseAnnotation(annotation);
                 });
@@ -252,7 +252,52 @@ class PDFAnnotator {
                     window.dispatchEvent(new CustomEvent('pdf-click-away'));
                 }
             });
+
         })
+
+        // hover
+        this.container.addEventListener('mousemove', (e) => {
+            // get all elements under cursor (now i dont need to care about z index)
+            const elementsUnderMouse = Array.from(document.elementsFromPoint(e.clientX, e.clientY));
+            // get highlight (only need one)
+            const hoveredHighlight = elementsUnderMouse.find(el => el.classList.contains('db-highlight'));
+            
+            if (hoveredHighlight) {
+                const id = hoveredHighlight.dataset.id;
+                const annotation = this.existingAnnotations.find(a => a.id === id);
+                
+                if (annotation && annotation.note) {
+                    window.dispatchEvent(new CustomEvent('pdf-show-tooltip', {
+                        detail: { note: annotation.note, x: e.clientX, y: e.clientY }
+                    }));
+                    return;
+                }
+            }
+            window.dispatchEvent(new CustomEvent('pdf-hide-tooltip'));
+        });
+        
+        // click
+        this.container.addEventListener('click', (e) => {
+            // get all elements under cursor (now i dont need to care about z index)
+            const elementsUnderMouse = Array.from(document.elementsFromPoint(e.clientX, e.clientY));
+            // get highlight (only need one)
+            const clickedHighlight = elementsUnderMouse.find(el => el.classList.contains('db-highlight'));
+            
+            if (clickedHighlight) {
+                const id = clickedHighlight.dataset.id;
+                window.dispatchEvent(new CustomEvent('pdf-annotation-clicked', {
+                    detail: { id: id }
+                }));
+            }
+            // this.removeHighlightsFromDOM(clickedHighlight.dataset.id);
+        });
+    }
+
+    removeHighlightsFromDOM(id) {
+        const highlightDivs = this.container.querySelectorAll(`.db-highlight[data-id="${id}"]`);
+        highlightDivs.forEach(div => div.remove());
+
+        this.existingAnnotations = this.existingAnnotations.filter(a => a.id !== id);
     }
 
     drawDatabaseAnnotation(annotation) {
@@ -271,7 +316,7 @@ class PDFAnnotator {
             const div = document.createElement('div');
 
             // db-highlight is just for identification not an actual style
-            div.className = "db-highlight absolute mix-blend-multiply";
+            div.className = "db-highlight absolute mix-blend-multiply cursor-pointer";
 
             div.dataset.id = annotation.id;
 
@@ -281,7 +326,8 @@ class PDFAnnotator {
             div.style.height = `${rect.y_max - rect.y_min}px`;
 
             div.style.backgroundColor = annotation.highlight_color || "rgba(255, 255, 0, 0.4)";
-            div.style.pointerEvents = "none";
+
+            div.style.pointerEvents = "auto";
 
             annotationLayerDiv.appendChild(div);
         })

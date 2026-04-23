@@ -37,4 +37,9 @@ new class extends Component
     {
         $this->dispatch('open-create-modal', type: 'annotation', parentId: $this->fileId, payload: $payload);
     }
+
+    public function triggerEditHighlight(string $id)
+    {
+        $this->dispatch('open-edit-modal', type: 'annotation', itemId: $id);
+    }
 };

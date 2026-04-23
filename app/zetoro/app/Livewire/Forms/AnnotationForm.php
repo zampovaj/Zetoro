@@ -6,8 +6,6 @@ use App\Models\Annotation;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
-use function PHPUnit\Framework\isEmpty;
-
 class AnnotationForm extends Form
 {
     public ?Annotation $annotation;
@@ -28,6 +26,9 @@ class AnnotationForm extends Form
     {
         $this->annotation = $annotation;
         $this->note = $annotation->note;
+        $this->rectangles = $annotation->rectangles;
+        $this->page = $annotation->page;
+        $this->highlightColor = $annotation->highlight_color;
     }
 
     public function fillAnnotation(array $data)
@@ -51,6 +52,24 @@ class AnnotationForm extends Form
             'highlight_color' => $this->highlightColor,
             'note' => $this->note,
         ]);
+
+        $this->reset();
+
+        return $annotation;
+    }
+
+    public function update(): Annotation
+    {
+        $this->validate();
+
+        $this->highlightColor = (empty($this->note) || $this->note === null) ? '#FFFF0080' : '#00bbff80';
+
+        $this->annotation->update([
+            'note' => $this->note,
+            'highlight_color' => $this->highlightColor,
+        ]);
+
+        $annotation = $this->annotation;
 
         $this->reset();
 

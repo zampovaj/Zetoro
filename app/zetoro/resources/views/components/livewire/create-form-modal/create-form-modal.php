@@ -63,7 +63,7 @@ new class extends Component
         } elseif ($type === 'file') {
             $this->fileForm->setFile(File::findOrFail($itemId));
         } elseif ($type === 'annotation') {
-            $this->annotationForm->setNote(Annotation::findOrFail($itemId));
+            $annotation = $this->annotationForm->setNote(Annotation::findOrFail($itemId));
         }
 
         Flux::modal('create-modal')->show();
@@ -85,16 +85,16 @@ new class extends Component
                 'article' => $this->articleForm->update(),
                 'folder' => $this->folderForm->update(),
                 // 'file' => $this->fileForm->update(),
-                // 'annotation' => $this->annotationForm->update(),
+                'annotation' => $this->annotationForm->update(),
             };
         }
 
         Flux::modal('create-modal')->close();
 
+        $eventName = $this->mode === 'create' ? 'item-created' : 'item-updated';
         if ($this->type === 'annotation') {
-            $this->dispatch('annotation-created', annotation: $item);
+            $this->dispatch('annotation-' . $eventName, annotation: $item);
         } else {
-            $eventName = $this->mode === 'create' ? 'item-created' : 'item-updated';
             // passing just id, causa ei need to refetch the item WITH relations so it makes no sense ot pass around the whole thing
             $this->dispatch($eventName, type: $this->type, itemId: $item->id);
         }
