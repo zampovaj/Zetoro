@@ -34,11 +34,11 @@ class AnnotationForm extends Form
         $this->page = $data['page'];
     }
 
-    public function store(string $fileId)
+    public function store(string $fileId): Annotation
     {
         $this->validate();
 
-        Annotation::create([
+        $annotation = Annotation::create([
             'file_id' => $fileId,
             'rectangles' => $this->rectangles,
             'page' => $this->page,
@@ -47,5 +47,7 @@ class AnnotationForm extends Form
         ]);
 
         $this->reset();
+
+        return $annotation;
     }
 }

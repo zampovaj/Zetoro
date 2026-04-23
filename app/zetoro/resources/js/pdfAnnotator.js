@@ -226,8 +226,6 @@ class PDFAnnotator {
                 };
             });
 
-            console.log(pageContainer.dataset.pageNumber);
-
             const payload = {
                 page: parseInt(pageContainer.dataset.pageNumber || 1),
                 rectangles: finalRects
@@ -247,6 +245,38 @@ class PDFAnnotator {
                     window.dispatchEvent(new CustomEvent('pdf-click-away'));
                 }
             });
+        })
+    }
+
+    drawDatabaseAnnotation(annotation) {
+        // javascript is so fucking stupid
+        // pageDiv.dataset.pageNumber = pageNumber is the same thing as this shit .pdf-page-wrapper[data-page-number="${annotation.page}"]
+        // i hate this
+        // find the specific page
+        const pageContainer = this.container.querySelector(`.pdf-page-wrapper[data-page-number="${annotation.page}"]`);
+        if (!pageContainer) return;
+
+        // find anotation layer for this page
+        const annotationLayerDiv = pageContainer.querySelector('.custom-annotation-layer');
+
+        // render each rectangle
+        annotation.rectangles.forEach(rect => {
+            const div = document.createElement('div');
+
+            // db-highlight is just for identification not an actual style
+            div.className = "db-highlight absolute mix-blend-multiply";
+
+            div.dataset.id = annotation.id;
+
+            div.style.left = `${rect.x_min}px`;
+            div.style.top = `${rect.y_min}px`;
+            div.style.width = `${rect.x_max - rect.x_min}px`;
+            div.style.height = `${rect.y_max - rect.y_min}px`;
+
+            div.style.backgroundColor = annotation.highlight_color || "rgba(255, 255, 0, 0.4)";
+            div.style.pointerEvents = "none";
+
+            annotationLayerDiv.appendChild(div);
         })
     }
 

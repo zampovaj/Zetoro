@@ -22,7 +22,9 @@ new class extends Component
     public function saveHighlight(array $payload)
     {
         $this->annotationForm->fillAnnotation($payload);
-        $this->annotationForm->store($this->fileId);
+        $annotation = $this->annotationForm->store($this->fileId);
+
+        $this->dispatch('annotation-created', annotation: $annotation);
     }
 
     public function triggerCreateNote(array $payload)

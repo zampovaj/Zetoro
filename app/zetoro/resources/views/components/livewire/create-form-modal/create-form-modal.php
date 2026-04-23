@@ -91,7 +91,9 @@ new class extends Component
 
         Flux::modal('create-modal')->close();
 
-        if ($this->type != 'annotation') {
+        if ($this->type === 'annotation') {
+            $this->dispatch('annotation-created', annotation: $item);
+        } else {
             $eventName = $this->mode === 'create' ? 'item-created' : 'item-updated';
             // passing just id, causa ei need to refetch the item WITH relations so it makes no sense ot pass around the whole thing
             $this->dispatch($eventName, type: $this->type, itemId: $item->id);
