@@ -6,6 +6,8 @@ use App\Models\Annotation;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
+use function PHPUnit\Framework\isEmpty;
+
 class AnnotationForm extends Form
 {
     public ?Annotation $annotation;
@@ -17,7 +19,7 @@ class AnnotationForm extends Form
     public int $page = 1;
 
     #[Validate('nullable|string')]
-    public string $highlightColor = '#FFFF0080';
+    public string $highlightColor = '';
 
     #[Validate('nullable|string')]
     public ?string $note = null;
@@ -37,6 +39,10 @@ class AnnotationForm extends Form
     public function store(string $fileId): Annotation
     {
         $this->validate();
+
+        if (empty($this->highlightColor) || $this->highlightColor === null) {
+            $this->highlightColor = (empty($this->note) || $this->note === null) ? '#FFFF0080' : '#00bbff80';
+        }
 
         $annotation = Annotation::create([
             'file_id' => $fileId,

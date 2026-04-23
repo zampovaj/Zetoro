@@ -6,9 +6,10 @@ import * as pdfjsViewer from 'pdfjs-dist/legacy/web/pdf_viewer.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 class PDFAnnotator {
-    constructor(pdfUrl, containerId) {
+    constructor(pdfUrl, containerId, existingAnnotations = []) {
         this.pdfUrl = pdfUrl;
         this.container = document.getElementById(containerId);
+        this.existingAnnotations = existingAnnotations;
 
         this.init();
         this.bindEvents();
@@ -18,10 +19,15 @@ class PDFAnnotator {
         try {
             const pdf = await pdfjsLib.getDocument(this.pdfUrl).promise;
 
-            for (let i = 1; i < pdf.numPages; i++) {
+            for (let i = 1; i <= pdf.numPages; i++) {
                 await this.renderPage(pdf, i);
             }
 
+            if(this.existingAnnotations.length > 0) {
+                this.existingAnnotations.forEach(annotation => {
+                    this.drawDatabaseAnnotation(annotation);
+                });
+            }
 
         } catch (error) {
             console.error("Error loading PDF:", error);
@@ -235,7 +241,8 @@ class PDFAnnotator {
                 detail: {
                     payload: payload,
                     mouseX: e.clientX,
-                    mouseY: e.clientY
+                    mouseY: e.clientY,
+                    containerId: this.container.id
                 }
             }));
 

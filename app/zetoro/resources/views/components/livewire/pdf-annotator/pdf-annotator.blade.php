@@ -2,7 +2,7 @@
     $containerId = 'pdf-container-' . $fileId;
 @endphp
 
-<div x-data="{
+<div data-annotations="{{ json_encode($this->annotations) }}" x-data="{
     annotator: null,
     showMenu: false,
     menuX: 0,
@@ -10,16 +10,28 @@
     selectionPayload: null,
 
     initPdf() {
+        const dbAnnotations = JSON.parse(this.$el.dataset.annotations || '[]');
+
         if (!window.PDFAnnotator) {
             window.addEventListener('pdf-annotator-ready', () => {
-                this.annotator = new window.PDFAnnotator('{{ route('files.pdf', $this->fileId) }}', '{{ $containerId }}');
+                this.annotator = new window.PDFAnnotator(
+                    '{{ route('files.pdf', $this->fileId) }}',
+                    '{{ $containerId }}',
+                    dbAnnotations
+                );
             }, { once: true });
         } else {
-            this.annotator = new window.PDFAnnotator('{{ route('files.pdf', $this->fileId) }}', '{{ $containerId }}');
+            this.annotator = new window.PDFAnnotator(
+                '{{ route('files.pdf', $this->fileId) }}',
+                '{{ $containerId }}',
+                dbAnnotations
+            );
         }
     },
 
     handleSelection(event) {
+        if (event.detail.containerId !== '{{ $containerId }}') return;
+        
         this.selectionPayload = event.detail.payload;
         this.menuX = event.detail.mouseX + 5;
         this.menuY = event.detail.mouseY + 10;
@@ -37,11 +49,11 @@
         this.$wire.triggerCreateNote(this.selectionPayload);
         window.getSelection().removeAllRanges();
     }
-    
+
 }" x-init="initPdf()"
-    @pdf-text-selected.window="handleSelection($event)"
-    @pdf-click-away.window="showMenu = false" class="w-full h-full relative"
-    @annotation-created.window="annotator.drawDatabaseAnnotation($event.detail.annotation)">
+    @pdf-text-selected.window="handleSelection($event)" @pdf-click-away.window="showMenu = false"
+    class="w-full h-full relative"
+    @annotation-created.window="if ($event.detail.annotation.file_id === '{{ $this->fileId }}') annotator.drawDatabaseAnnotation($event.detail.annotation)">
 
     <div wire:ignore id="{{ $containerId }}"
         class="relative w-full max-w-3xl mx-auto bg-gray-100 overflow-y-auto overflow-x-hidden p-4 h-[100vh]">

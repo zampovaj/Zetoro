@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Forms\AnnotationForm;
+use App\Models\Annotation;
 use App\Models\File;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
@@ -17,6 +18,11 @@ new class extends Component
     public function file()
     {
         return File::findOrFail($this->fileId);
+    }
+
+    #[Computed()]
+    public function annotations() {
+        return Annotation::where('file_id', $this->fileId)->get();
     }
 
     public function saveHighlight(array $payload)
