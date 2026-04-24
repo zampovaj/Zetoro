@@ -30,7 +30,7 @@ new class extends Component
         $this->annotationForm->fillAnnotation($payload);
         $annotation = $this->annotationForm->store($this->fileId);
 
-        $this->dispatch('annotation-created', annotation: $annotation);
+        $this->dispatch('annotation-item-created', annotation: $annotation);
     }
 
     public function triggerCreateNote(array $payload)

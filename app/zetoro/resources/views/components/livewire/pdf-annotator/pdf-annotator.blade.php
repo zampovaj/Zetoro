@@ -56,23 +56,24 @@
     },
 
     displayToolTip(event) {
-        showToolTip = true;
-        tooltipText = event.detail.note;
-        tooltipX = event.detail.x;
-        tooltipY = event.detail.y;
+        console.log('hi');
+        this.showToolTip = true;
+        this.tooltipText = event.detail.note;
+        this.tooltipX = event.detail.x;
+        this.tooltipY = event.detail.y;
     },
 
     updateAnnotation(annotation) {        
         if (annotation.file_id != '{{ $this->fileId }}') return;
         
         this.annotator.removeHighlightsFromDOM(annotation.id);
-        this.annotator.drawDatabaseAnnotation(annotation);
+        this.annotator.addNewAnnotation(annotation);
     }
 
 }" x-init="initPdf()"
     @pdf-text-selected.window="handleSelection($event)" @pdf-click-away.window="showMenu = false"
     class="w-full h-full relative"
-    @annotation-item-created.window="if ($event.detail.annotation.file_id === '{{ $this->fileId }}') annotator.drawDatabaseAnnotation($event.detail.annotation)"
+    @annotation-item-created.window="if ($event.detail.annotation.file_id === '{{ $this->fileId }}') annotator.addNewAnnotation($event.detail.annotation)"
     @annotation-item-updated.window="updateAnnotation($event.detail.annotation)"
     @pdf-annotation-clicked.window="$wire.triggerEditHighlight($event.detail.id)"
     @pdf-show-tooltip.window="displayToolTip($event)"
@@ -98,8 +99,8 @@
         </button>
     </div>
 
-    <div x-show="showToolTip" x-transition.opacity.duration.100ms
+    <div id="tooltip" x-show="showToolTip" x-transition.opacity.duration.100ms
         class="fixed z-50 px-3 py-2 text-sm font-medium text-white bg-zinc-900 dark:bg-zinc-700 rounded-lg shadow-lg pointer-events-none max-w-xs whitespace-pre-wrap"
-        x-bind:style="`top: ${tooltipY + 15}px; left: ${tooltipX + 15}px;`" x-text="tooltipText" style="display: none;">
+        x-bind:style="`top: ${tooltipY + 15}px; left: ${tooltipX + 15}px;`" x-text="tooltipText" >
     </div>
 </div>

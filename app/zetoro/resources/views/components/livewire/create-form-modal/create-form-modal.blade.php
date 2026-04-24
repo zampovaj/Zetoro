@@ -8,7 +8,7 @@
     <x-create-modal :action="$mode" name="create-modal" :title="$modalTitle" :subtitle="$modalSubtitle">
 
         @if ($type === 'annotation')
-            <flux:input wire:model="annotationForm.note" label="Note" />
+            <flux:textarea wire:model="annotationForm.note" label="Note" />
             
         @elseif ($type === 'article')
             <flux:input wire:model="articleForm.title" label="Title" required />

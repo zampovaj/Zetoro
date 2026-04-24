@@ -256,33 +256,42 @@ class PDFAnnotator {
         })
 
         // hover
+
+        // to prevent event spam
+        let currentId = null;
+
         this.container.addEventListener('mousemove', (e) => {
             // get all elements under cursor (now i dont need to care about z index)
             const elementsUnderMouse = Array.from(document.elementsFromPoint(e.clientX, e.clientY));
             // get highlight (only need one)
             const hoveredHighlight = elementsUnderMouse.find(el => el.classList.contains('db-highlight'));
-            
+
             if (hoveredHighlight) {
                 const id = hoveredHighlight.dataset.id;
+                if (id == currentId) return;
+
                 const annotation = this.existingAnnotations.find(a => a.id === id);
-                
+
                 if (annotation && annotation.note) {
                     window.dispatchEvent(new CustomEvent('pdf-show-tooltip', {
                         detail: { note: annotation.note, x: e.clientX, y: e.clientY }
                     }));
+
+                    currentId = id;
                     return;
                 }
             }
             window.dispatchEvent(new CustomEvent('pdf-hide-tooltip'));
+            currentId = null;
         });
-        
+
         // click
         this.container.addEventListener('click', (e) => {
             // get all elements under cursor (now i dont need to care about z index)
             const elementsUnderMouse = Array.from(document.elementsFromPoint(e.clientX, e.clientY));
             // get highlight (only need one)
             const clickedHighlight = elementsUnderMouse.find(el => el.classList.contains('db-highlight'));
-            
+
             if (clickedHighlight) {
                 const id = clickedHighlight.dataset.id;
                 window.dispatchEvent(new CustomEvent('pdf-annotation-clicked', {
@@ -298,6 +307,13 @@ class PDFAnnotator {
         highlightDivs.forEach(div => div.remove());
 
         this.existingAnnotations = this.existingAnnotations.filter(a => a.id !== id);
+    }
+
+    addNewAnnotation(annotation) {
+        if (!annotation) return;
+
+        this.existingAnnotations.push(annotation);
+        this.drawDatabaseAnnotation(annotation);
     }
 
     drawDatabaseAnnotation(annotation) {
