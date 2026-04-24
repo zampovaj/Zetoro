@@ -133,21 +133,6 @@ class PDFAnnotator {
         }
     }
 
-    // alignLayers() {
-    //     const canvasLeft = this.canvas.offsetLeft;
-    //     const width = Math.floor(this.viewport.width);
-    //     const height = Math.floor(this.viewport.height);
-
-    //     [this.textLayerDiv, this.annotationLayerDiv].forEach(layer => {
-    //         layer.style.width = `${width}px`;
-    //         layer.style.height = `${height}px`;
-    //         layer.style.left = `${canvasLeft}px`;
-    //         layer.style.top = '0px';
-    //     });
-
-    //     this.textLayerDiv.style.setProperty('--scale-factor', this.scale);
-    // }
-
     async renderHighlightAnnotations(page, annotationLayerDiv, viewport) {
         const annotations = await page.getAnnotations();
 
@@ -259,30 +244,42 @@ class PDFAnnotator {
 
         // to prevent event spam
         let currentId = null;
+        let hideTimeout = null;
 
         this.container.addEventListener('mousemove', (e) => {
             // get all elements under cursor (now i dont need to care about z index)
             const elementsUnderMouse = Array.from(document.elementsFromPoint(e.clientX, e.clientY));
             // get highlight (only need one)
             const hoveredHighlight = elementsUnderMouse.find(el => el.classList.contains('db-highlight'));
+            const hoveredTooltip = elementsUnderMouse.find(el => el.id === 'note-tooltip');
 
-            if (hoveredHighlight) {
-                const id = hoveredHighlight.dataset.id;
-                if (id == currentId) return;
+            if (hoveredHighlight || hoveredTooltip) {
+                clearTimeout(hideTimeout);
 
-                const annotation = this.existingAnnotations.find(a => a.id === id);
+                if (hoveredHighlight) {
+                    const id = hoveredHighlight.dataset.id;
+                    if (id == currentId) return;
 
-                if (annotation && annotation.note) {
-                    window.dispatchEvent(new CustomEvent('pdf-show-tooltip', {
-                        detail: { note: annotation.note, x: e.clientX, y: e.clientY }
-                    }));
+                    const annotation = this.existingAnnotations.find(a => a.id === id);
 
-                    currentId = id;
+                    if (annotation && annotation.note) {
+                        window.dispatchEvent(new CustomEvent('pdf-show-tooltip', {
+                            detail: { note: annotation.note, x: e.clientX, y: e.clientY }
+                        }));
+
+                        currentId = id;
+                    }
                     return;
                 }
             }
-            window.dispatchEvent(new CustomEvent('pdf-hide-tooltip'));
-            currentId = null;
+            else {
+                if (currentId != null) {
+                    hideTimeout = setTimeout(() => {
+                        window.dispatchEvent(new CustomEvent('pdf-hide-tooltip'));
+                        currentId = null;
+                    }, 200);
+                }
+            }
         });
 
         // click
@@ -348,48 +345,6 @@ class PDFAnnotator {
             annotationLayerDiv.appendChild(div);
         })
     }
-
-    // bindEvents() {
-    //     this.container.addEventListener("mouseup", () => {
-    //         const sel = window.getSelection();
-    //         if (!sel.toString() || sel.rangeCount === 0) return;
-
-    //         const range = sel.getRangeAt(0);
-
-    //         // page
-    //         let node = range.commonAncestorContainer;
-    //         if (node.nodeType === 3) node = node.parentNode;
-    //         const pageContainer = node.closest('.pdf-page-wrapper');
-    //         if (!pageContainer) return;
-
-    //         // page specific annotation layer
-    //         const annotationLayerDiv = pageContainer.querySelector('.custom-annotation-layer');
-    //         const containerRect = annotationLayerDiv.getBoundingClientRect();
-
-    //         // get all rectangles and treat them as an array
-    //         const rawRects = Array.from(range.getClientRects());
-
-    //         // turn them into lines
-    //         const mergedRects = this.mergeRectangles(rawRects);
-
-    //         const highlightGroup = document.createElement("div");
-    //         highlightGroup.className = "highlight-group";
-
-    //         mergedRects.forEach(rect => {
-    //             const div = document.createElement("div");
-    //             div.style.position = "absolute";
-    //             div.style.left = `${rect.left - containerRect.left}px`;
-    //             div.style.top = `${rect.top - containerRect.top}px`;
-    //             div.style.width = `${rect.width}px`;
-    //             div.style.height = `${rect.height}px`;
-    //             div.style.background = "rgba(255, 255, 0, 0.4)";
-    //             div.style.pointerEvents = "none";
-    //             highlightGroup.appendChild(div);
-    //         });
-
-    //         annotationLayerDiv.appendChild(highlightGroup);
-    //     });
-    // }
 
     // need to have this one to remove duplications and create nice lines
     mergeRectangles(rects) {

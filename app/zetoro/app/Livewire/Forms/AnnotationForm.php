@@ -3,8 +3,11 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Annotation;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
+
+use function PHPUnit\Framework\isEmpty;
 
 class AnnotationForm extends Form
 {
@@ -41,6 +44,9 @@ class AnnotationForm extends Form
     {
         $this->validate();
 
+        $this->note = trim($this->note);
+        if($this->note === '') $this->note = null;
+
         if (empty($this->highlightColor) || $this->highlightColor === null) {
             $this->highlightColor = (empty($this->note) || $this->note === null) ? '#FFFF0080' : '#00bbff80';
         }
@@ -61,6 +67,9 @@ class AnnotationForm extends Form
     public function update(): Annotation
     {
         $this->validate();
+
+        $this->note = trim($this->note);
+        if($this->note === '') $this->note = null;
 
         $this->highlightColor = (empty($this->note) || $this->note === null) ? '#FFFF0080' : '#00bbff80';
 

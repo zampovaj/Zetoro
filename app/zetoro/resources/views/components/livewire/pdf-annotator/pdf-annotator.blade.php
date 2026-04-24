@@ -99,8 +99,8 @@
         </button>
     </div>
 
-    <div id="tooltip" x-show="showToolTip" x-transition.opacity.duration.100ms
-        class="fixed z-50 px-3 py-2 text-sm font-medium text-white bg-zinc-900 dark:bg-zinc-700 rounded-lg shadow-lg pointer-events-none max-w-xs whitespace-pre-wrap"
+    <div id="note-tooltip" x-show="showToolTip" x-transition.opacity.duration.100ms
+        class="fixed z-50 px-3 py-2 text-sm font-medium text-white bg-zinc-900 dark:bg-zinc-700 rounded-lg shadow-lg pointer-events-auto max-w-xs whitespace-pre-wrap"
         x-bind:style="`top: ${tooltipY + 15}px; left: ${tooltipX + 15}px;`" x-text="tooltipText" >
     </div>
 </div>
