@@ -21,7 +21,8 @@ new class extends Component
     }
 
     #[Computed()]
-    public function annotations() {
+    public function annotations()
+    {
         return Annotation::where('file_id', $this->fileId)->get();
     }
 
@@ -35,11 +36,13 @@ new class extends Component
 
     public function triggerCreateNote(array $payload)
     {
+        $this->dispatch('pdf-hide-tooltip');
         $this->dispatch('open-create-modal', type: 'annotation', parentId: $this->fileId, payload: $payload);
     }
 
     public function triggerEditHighlight(string $id)
     {
+        $this->dispatch('pdf-hide-tooltip');
         $this->dispatch('open-edit-modal', type: 'annotation', itemId: $id);
     }
 };
