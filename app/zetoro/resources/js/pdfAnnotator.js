@@ -242,9 +242,9 @@ class PDFAnnotator {
 
         // hover
 
-        // to prevent event spam
         let currentId = null;
         let hideTimeout = null;
+        let showTimeout = null;
 
         this.container.addEventListener('mousemove', (e) => {
             // get all elements under cursor (now i dont need to care about z index)
@@ -254,24 +254,27 @@ class PDFAnnotator {
             const hoveredTooltip = elementsUnderMouse.find(el => el.id === 'note-tooltip');
 
             if (hoveredHighlight || hoveredTooltip) {
-                clearTimeout(hideTimeout);
+                showTimeout = setTimeout(() => {
+                    clearTimeout(hideTimeout);
 
-                if (hoveredHighlight) {
-                    const id = hoveredHighlight.dataset.id;
-                    if (id == currentId) return;
+                    if (hoveredHighlight) {
+                        const id = hoveredHighlight.dataset.id;
+                        if (id == currentId) return;
 
-                    const annotation = this.existingAnnotations.find(a => a.id === id);
+                        const annotation = this.existingAnnotations.find(a => a.id === id);
 
-                    if (annotation && annotation.note) {
-                        window.dispatchEvent(new CustomEvent('pdf-show-tooltip', {
-                            detail: { note: annotation.note, x: e.clientX, y: e.clientY }
-                        }));
+                        if (annotation && annotation.note) {
+                            window.dispatchEvent(new CustomEvent('pdf-show-tooltip', {
+                                detail: { note: annotation.note, x: e.clientX, y: e.clientY }
+                            }));
 
-                        currentId = id;
+                            currentId = id;
+                        }
+                        return;
                     }
-                    return;
-                }
+                }, 200);
             }
+
             else {
                 if (currentId != null) {
                     hideTimeout = setTimeout(() => {
