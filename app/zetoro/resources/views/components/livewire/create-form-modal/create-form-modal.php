@@ -8,10 +8,12 @@ use App\Models\Annotation;
 use App\Models\Article;
 use App\Models\File;
 use App\Models\Folder;
+use App\Services\DeleteService;
 use Flux\Flux;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use PharIo\Manifest\License;
 
 new class extends Component
 {
@@ -63,7 +65,7 @@ new class extends Component
         } elseif ($type === 'file') {
             $this->fileForm->setFile(File::findOrFail($itemId));
         } elseif ($type === 'annotation') {
-            $annotation = $this->annotationForm->setNote(Annotation::findOrFail($itemId));
+            $this->annotationForm->setNote(Annotation::findOrFail($itemId));
         }
 
         Flux::modal('create-modal')->show();
@@ -93,10 +95,30 @@ new class extends Component
 
         $eventName = $this->mode === 'create' ? 'item-created' : 'item-updated';
         if ($this->type === 'annotation') {
-            $this->dispatch('annotation-' . $eventName, annotation: $item);
+            $this->dispatch('annotation-'.$eventName, annotation: $item);
         } else {
             // passing just id, causa ei need to refetch the item WITH relations so it makes no sense ot pass around the whole thing
             $this->dispatch($eventName, type: $this->type, itemId: $item->id);
         }
+    }
+
+    public function delete(DeleteService $service)
+    {
+        $idsToRemove = $service->delete($this->type, $this->editItemId);
+        $this->dispatch('item-deleted', fileIds: $idsToRemove);
+
+        if ($this->type === 'annotation') {
+            $this->dispatch('pdf-annotation-removed', id:$this->editItemId);
+        }
+
+        match ($this->type) {
+            'article' => $this->articleForm->reset(),
+            'folder' => $this->folderForm->reset(),
+            'file' => $this->fileForm->reset(),
+            'annotation' => $this->annotationForm->reset(),
+            default => null,
+        };
+
+        Flux::modal('create-modal')->close();
     }
 };

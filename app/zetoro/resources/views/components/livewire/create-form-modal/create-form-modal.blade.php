@@ -2,6 +2,7 @@
     @php
         $actionName = $mode === 'create' ? 'Create New ' : 'Edit ';
         $modalTitle = $actionName . ($type ? ucfirst($type) : 'Item');
+        $delete = $mode === 'edit';
 
         if ($mode === 'create') {
             $modalSubtitle = match($type) {
@@ -15,7 +16,12 @@
         }
     @endphp
 
-    <x-create-modal :action="$mode" name="create-modal" :title="$modalTitle" :subtitle="$modalSubtitle">
+    <x-create-modal
+        :action="$mode"
+        name="create-modal"
+        :title="$modalTitle"
+        :subtitle="$modalSubtitle"
+        :delete="$delete">
 
         @if ($type === 'annotation')
             <flux:textarea wire:model="annotationForm.note" label="Note" />

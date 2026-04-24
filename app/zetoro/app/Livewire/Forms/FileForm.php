@@ -44,19 +44,18 @@ class FileForm extends Form
         return $file;
     }
 
-    // public function update(): File
-    // {
-    //     $this->validate();
+    public function update(): File
+    {
+        $this->validate();
 
-    //     $this->file->update([
-    //         'name' => $this->name,
-    //         'path' => $this->path,
-    //     ]);
+        $this->file->update([
+            'name' => $this->name,
+        ]);
 
-    //     $file = $this->file;
+        $file = $this->file;
 
-    //     $this->reset();
+        $this->reset();
 
-    //     return $file;
-    // }
+        return $file;
+    }
 }

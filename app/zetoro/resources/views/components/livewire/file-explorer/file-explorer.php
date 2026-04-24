@@ -6,17 +6,21 @@ use App\Models\Folder;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use App\Services\DeleteService;
 
 new class extends Component
 {
     public Collection $allFolders;
-
     public Collection $rootFolders;
-
     public Collection $orphanArticles;
 
     public function mount(): void
     {
+        $this->loadData();
+    }
+
+    #[On('item-deleted')]
+    public function reload(): void {
         $this->loadData();
     }
 
@@ -37,21 +41,10 @@ new class extends Component
         $this->dispatch('open-create-modal', type: $type, parentId: $itemId);
     }
 
-    public function triggerDelete(string $type, $itemId): void
-    {
-        $idsToRemove = match ($type) {
-            'file'    => [$itemId],
-            'article' => File::whereArticleId($itemId)->pluck('id')->toArray(),
-            'folder'  => [],
-            default   => [],
-        };
-        match ($type) {
-            'folder' => Folder::destroy($itemId),
-            'article' => Article::destroy($itemId),
-            'file' => File::destroy($itemId),
-        };
+    public function triggerDelete(DeleteService $service, string $type, $itemId): void
+    {        
+        $idsToRemove = $service->delete($type, $itemId);
 
-        $this->loadData();
         $this->dispatch('item-deleted', fileIds: $idsToRemove);
     }
 
@@ -80,8 +73,6 @@ new class extends Component
                 // its actually cheaper to reload then search inside the tree
                 $this->loadData();
             }
-        } elseif ($type === 'file') {
-            $this->loadData();
         } else {
             $this->loadData();
         }
