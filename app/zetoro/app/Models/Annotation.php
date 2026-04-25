@@ -16,6 +16,7 @@ class Annotation extends Model
         'page',
         'highlight_color',
         'note',
+        'text', 
     ];
 
     protected $casts = [

@@ -94,10 +94,11 @@ new class extends Component
         Flux::modal('create-modal')->close();
 
         $eventName = $this->mode === 'create' ? 'item-created' : 'item-updated';
+
         if ($this->type === 'annotation') {
             $this->dispatch('annotation-'.$eventName, annotation: $item);
         } else {
-            // passing just id, causa ei need to refetch the item WITH relations so it makes no sense ot pass around the whole thing
+            // passing just id, cause i need to refetch the item WITH relations so it makes no sense to pass around the whole thing
             $this->dispatch($eventName, type: $this->type, itemId: $item->id);
         }
     }
@@ -108,7 +109,7 @@ new class extends Component
         $this->dispatch('item-deleted', fileIds: $idsToRemove);
 
         if ($this->type === 'annotation') {
-            $this->dispatch('pdf-annotation-removed', id:$this->editItemId);
+            $this->dispatch('pdf-annotation-deleted', id:$this->editItemId);
         }
 
         match ($this->type) {

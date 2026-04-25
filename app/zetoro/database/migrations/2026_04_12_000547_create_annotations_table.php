@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('page');
             $table->string('highlight_color')->default('#FFFF0080');
             $table->string('note')->nullable(); // if null -> no note
+            $table->string('text');
             
             $table->timestamps();
         });

@@ -217,9 +217,12 @@ class PDFAnnotator {
                 };
             });
 
+            const selectedText = sel.toString();
+
             const payload = {
                 page: parseInt(pageContainer.dataset.pageNumber || 1),
-                rectangles: finalRects
+                rectangles: finalRects,
+                selectedText
             }
 
             window.dispatchEvent(new CustomEvent('pdf-text-selected', {

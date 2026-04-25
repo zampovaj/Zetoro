@@ -37,7 +37,7 @@
     @annotation-item-created.window="if ($event.detail.annotation.file_id === '{{ $this->fileId }}') annotator.addNewAnnotation($event.detail.annotation)"
     @annotation-item-updated.window="updateAnnotation($event.detail.annotation)"
     @pdf-annotation-clicked.window="$wire.triggerEditHighlight($event.detail.id)"
-    @pdf-annotation-removed.window="annotator.removeHighlightsFromDOM($event.detail.id)">
+    @pdf-annotation-deleted.window="annotator.removeHighlightsFromDOM($event.detail.id)">
 
     <div wire:ignore id="{{ $containerId }}"
         class="relative w-full max-w-3xl mx-auto bg-gray-100 overflow-y-auto overflow-x-hidden p-4 h-[100vh]">

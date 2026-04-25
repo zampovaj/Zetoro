@@ -22,8 +22,11 @@ class AnnotationForm extends Form
     #[Validate('nullable|string')]
     public string $highlightColor = '';
 
-    #[Validate('nullable|string')]
+    #[Validate('nullable|string|max:10000')]
     public ?string $note = null;
+
+    #[Validate('required|string')]
+    public string $text = '';
 
     public function setNote(Annotation $annotation)
     {
@@ -32,12 +35,14 @@ class AnnotationForm extends Form
         $this->rectangles = $annotation->rectangles;
         $this->page = $annotation->page;
         $this->highlightColor = $annotation->highlight_color;
+        $this->text = $annotation->text;
     }
 
     public function fillAnnotation(array $data)
     {
         $this->rectangles = $data['rectangles'];
         $this->page = $data['page'];
+        $this->text = $data['selectedText'];
     }
 
     public function store(string $fileId): Annotation
@@ -57,6 +62,7 @@ class AnnotationForm extends Form
             'page' => $this->page,
             'highlight_color' => $this->highlightColor,
             'note' => $this->note,
+            'text' => $this->text,
         ]);
 
         $this->reset();
