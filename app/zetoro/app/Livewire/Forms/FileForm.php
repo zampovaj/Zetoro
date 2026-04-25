@@ -12,11 +12,22 @@ class FileForm extends Form
 {
     public ?File $file = null;
 
-    #[Validate('nullable|string|min:1')]
     public string $name = 'article';
-
-    #[Validate('required|file|mimes:pdf|max:51200')]
     public ?UploadedFile $uploadFile = null;
+
+    protected function rules()
+    {
+        return [
+            'name' => 'nullable|string|min:1',
+            // only required if we not in edit mode
+            'uploadFile' => [
+                $this->file ? 'nullable' : 'required', 
+                'file', 
+                'mimes:pdf', 
+                'max:51200'
+            ],
+        ];
+    }
 
     public function setFile(File $file)
     {

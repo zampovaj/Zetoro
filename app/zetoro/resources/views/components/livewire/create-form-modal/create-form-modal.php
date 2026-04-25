@@ -86,7 +86,7 @@ new class extends Component
             $item = match ($this->type) {
                 'article' => $this->articleForm->update(),
                 'folder' => $this->folderForm->update(),
-                // 'file' => $this->fileForm->update(),
+                'file' => $this->fileForm->update(),
                 'annotation' => $this->annotationForm->update(),
             };
         }
