@@ -1,6 +1,6 @@
 @props(['action' => 'create', 'name', 'title', 'subtitle' => '', 'delete' => false])
 
-<flux:modal :name="$name" class="min-w-[400px]">
+<flux:modal :name="$name" class="min-w-100">
     <form wire:submit="save" class="space-y-6">
 
         <div>

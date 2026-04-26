@@ -1,8 +1,8 @@
-@props(['itemId'])
+@props(['itemId', 'size' => 3])
 
 <flux:dropdown>
     <button type="button" class="p-1 text-zinc-400 hover:text-green-500 rounded cursor-pointer" @click.stop>
-        <flux:icon.plus class="size-3" />
+        <flux:icon.plus class="size-{{ $size }}" />
     </button>
 
     <flux:menu>

@@ -81,6 +81,14 @@
                 colorClass="text-zinc-400 hover:text-red-500"
                 icon="trash" >
             </x-action-button>
+
+            <x-action-button
+                action="triggerInspector"
+                :type="$type"
+                :itemId="$item->id"
+                colorClass="text-zinc-400 hover:text-yellow-500"
+                icon="bars-3-bottom-right" >
+            </x-action-button>
         </div>
     </div>
 

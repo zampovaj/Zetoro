@@ -1,9 +1,9 @@
 <div class="flex flex-col h-full">
     <div
-        class="py-3 border-b border-gray-700 flex justify-between items-center text-sm font-semibold uppercase tracking-wider text-gray-400">
+        class="py-3 border-b border-gray-700 flex justify-between items-center text-sm font-semibold uppercase tracking-wider text-gray-400 pb-4 pr-4">
         <span>Explorer</span>
 
-        <x-create-dropdown :itemId="null" />
+        <x-create-dropdown :itemId="null" :size="4" />
 
     </div>
 

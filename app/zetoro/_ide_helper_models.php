@@ -14,29 +14,27 @@
 namespace App\Models{
 /**
  * @property string $id
- * @property string $article_id
- * @property float $x_min
- * @property float $y_min
- * @property float $x_max
- * @property float $y_max
- * @property string|null $highlight_color
+ * @property string $file_id
+ * @property array<array-key, mixed> $rectangles
+ * @property int $page
+ * @property string $highlight_color
  * @property string|null $note
+ * @property string $text
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
- * @property-read \App\Models\Article|null $article
+ * @property-read \App\Models\File $file
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereArticleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereFileId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereHighlightColor($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereNote($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation wherePage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereRectangles($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereXMax($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereXMin($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereYMax($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Annotation whereYMin($value)
  */
 	class Annotation extends \Eloquent {}
 }

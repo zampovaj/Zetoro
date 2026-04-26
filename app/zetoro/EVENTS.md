@@ -16,3 +16,5 @@
 - pdf-show-tooltip { note, x, y }
 - pdf-annotation-clicked { id }
 - pdf-annotator-ready
+- load-inspector { type, itemId }
+

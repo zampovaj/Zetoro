@@ -1,17 +1,18 @@
 <?php
 
 use App\Models\Article;
-use App\Models\File;
 use App\Models\Folder;
+use App\Services\DeleteService;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use App\Services\DeleteService;
 
 new class extends Component
 {
     public Collection $allFolders;
+
     public Collection $rootFolders;
+
     public Collection $orphanArticles;
 
     public function mount(): void
@@ -20,7 +21,8 @@ new class extends Component
     }
 
     #[On('item-deleted')]
-    public function reload(): void {
+    public function reload(): void
+    {
         $this->loadData();
     }
 
@@ -42,10 +44,15 @@ new class extends Component
     }
 
     public function triggerDelete(DeleteService $service, string $type, $itemId): void
-    {        
+    {
         $idsToRemove = $service->delete($type, $itemId);
 
         $this->dispatch('item-deleted', fileIds: $idsToRemove);
+    }
+
+    public function triggerInspector(string $type, string $itemId)
+    {
+        $this->dispatch('load-inspector', type: $type, itemId: $itemId);
     }
 
     public function openFile(string $fileId, string $title): void
