@@ -30,14 +30,25 @@
 
         this.annotator.removeHighlightsFromDOM(annotation.id);
         this.annotator.addNewAnnotation(annotation);
+    },
+
+    handleScrollRequest(fileId, annotationId, pageNumber) {
+        const needsFileSwitch = fileId != '{{ $this->fileId }}';
+        const delay = needsFileSwitch ? 500 : 100;
+
+        setTimeout(() => {
+            if (fileId != '{{ $this->fileId }}') return;
+            this.annotator.scrollToAnnotation(annotationId, pageNumber);
+        }, delay);
     }
 
 }" x-init="initPdf()"
-    class="w-full h-full relative" 
+    class="w-full h-full relative"
     @annotation-item-created.window="if ($event.detail.annotation.file_id === '{{ $this->fileId }}') annotator.addNewAnnotation($event.detail.annotation)"
     @annotation-item-updated.window="updateAnnotation($event.detail.annotation)"
     @pdf-annotation-clicked.window="$wire.triggerEditHighlight($event.detail.id)"
-    @pdf-annotation-deleted.window="annotator.removeHighlightsFromDOM($event.detail.id)">
+    @pdf-annotation-deleted.window="annotator.removeHighlightsFromDOM($event.detail.id)"
+    @open-annotation.window="handleScrollRequest($event.detail.fileId, $event.detail.annotationId, $event.detail.pageNumber)">
 
     <div wire:ignore id="{{ $containerId }}"
         class="relative w-full max-w-3xl mx-auto bg-gray-100 overflow-y-auto overflow-x-hidden p-4 h-[100vh]">

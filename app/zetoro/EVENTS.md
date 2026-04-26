@@ -17,4 +17,8 @@
 - pdf-annotation-clicked { id }
 - pdf-annotator-ready
 - load-inspector { type, itemId }
+- open-annotation { fileId, annotationId, pageNumber }
+- request-file-open-scroll { fileId, title, annotationId, pageNumber }
+
+
 

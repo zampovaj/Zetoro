@@ -33,8 +33,7 @@
     };
 @endphp
 
-<div
-    class=" hidden xl:flex absolute top-0 right-0 h-full w-80 flex-col
+<div class=" hidden xl:flex absolute top-0 right-0 h-full w-80 flex-col
             bg-zinc-50 dark:bg-zinc-900
             border-l border-zinc-200 dark:border-zinc-700 z-20">
 
@@ -52,43 +51,36 @@
     <div class="overflow-y-auto">
 
         @if ($this->item != null)
-            <x-inspector.section-list title="Properties" icon="document-text" :items="$properties" :defaultExpanded="true">
-
+            <x-inspector.section-list
+                title="Properties"
+                icon="document-text"
+                :items="$properties" >
             </x-inspector.section-list>
 
-            <x-inspector.inspector-section title="Properties" icon="pencil">
-                <div class="text-xs text-zinc-500 space-y-2">
-                    <p>Created: 1.1.2000</p>
-                </div>
-                <div class="text-xs text-zinc-500 space-y-2">
-                    <p>Created: 1.1.2000</p>
-                </div>
-                <div class="text-xs text-zinc-500 space-y-2">
-                    <p>Created: 1.1.2000</p>
-                </div>
-                <div class="text-xs text-zinc-500 space-y-2">
-                    <p>Created: 1.1.2000</p>
-                </div>
+            <x-inspector.inspector-section title="Annotations" icon="pencil" >
+
+                @forelse ($this->files->filter(fn($f) => $f->annotations->isNotEmpty()) as $file)
+                    @if(!$loop->first)
+                        <div class="h-2"></div>
+                    @endif
+
+                    <div class="text-zinc-300 text-mb text-center bg-zinc-700 rounded-lg py-3">
+                        {{ $file->name }}
+                    </div>
+
+                    <livewire:livewire.inspector-annotations-section :file="$file">
+                    </livewire:livewire.inspector-annotations-section>
+                @empty
+                    <span class="font-normal">
+                        {{ 'No annotations available.' }}
+                    </span>
+                @endforelse
+
             </x-inspector.inspector-section>
 
-            <x-inspector.inspector-section title="Properties" icon="pencil">
-                <div class="text-xs text-zinc-500 space-y-2">
-                    <p>Created: 1.1.2000</p>
-                </div>
-                <div class="text-xs text-zinc-500 space-y-2">
-                    <p>Created: 1.1.2000</p>
-                </div>
-                <div class="text-xs text-zinc-500 space-y-2">
-                    <p>Created: 1.1.2000</p>
-                </div>
-                <div class="text-xs text-zinc-500 space-y-2">
-                    <p>Created: 1.1.2000</p>
-                </div>
-            </x-inspector.inspector-section>
-        
         @else
 
-        <div class="flex text-mb flex-col min-h-[80vh] text-zinc-400 items-center justify-center">
+        <div class="flex text-sm flex-col min-h-[80vh] text-zinc-400 items-center justify-center">
             <div>
                 <flux:icon.exclamation-triangle />
             </div>

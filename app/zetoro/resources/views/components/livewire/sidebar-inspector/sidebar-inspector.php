@@ -11,19 +11,35 @@ use Livewire\Component;
 new class extends Component
 {
     public ?Model $item = null;
+
     public ?string $type = null;
+
     public ?string $itemId = null;
 
-    public Collection $annotations;
+    public Collection $files;
+
     public Collection $children;
+
     public Collection $parents;
 
     public ?string $parentName = null;
 
-    public function mount() {
-        $this->annotations = collect();
+    public function mount()
+    {
+        $this->files = collect();
         $this->children = collect();
         $this->parents = collect();
+    }
+
+    #[On('annotation-item-created')]
+    #[On('annotation-item-updated')]
+    #[On('item-created')]
+    #[On('item-updated')]
+    #[On('item-deleted')]
+    public function reload()
+    {
+        $this->item = null;
+        $this->load($this->type, $this->itemId);
     }
 
     #[On('load-inspector')]
@@ -34,16 +50,30 @@ new class extends Component
 
         if ($this->type === 'file') {
             $this->item = File::with('annotations')->find($itemId);
-            $this->annotations = $this->item?->annotations;
             $this->parentName = Article::findOrFail($this->item?->article_id)->metadata->title;
+            $this->files = $this->item ? collect([$this->item]) : collect();
         } elseif ($this->type === 'article') {
-            $this->item = Article::with('files')->find($itemId);
+            $this->item = Article::with('files.annotations')->find($itemId);
             $this->parents = $this->item?->folders;
             $this->children = $this->item?->files;
-        } else if ($this->type === 'folder') {
-            $this->item = Folder::with('articles.files')->find($itemId);
+            $this->files = $this->item?->files ?? collect();
+        } elseif ($this->type === 'folder') {
+            $this->item = Folder::with('articles.files.annotations')->find($itemId);
+            $this->item?->load('allChildren.articles.files.annotations', 'articles.files.annotations');
             $this->children = $this->item?->articles;
             $this->parentName = Folder::find($this->item?->parent_id)?->name ?? 'None';
+            $this->files = $this->item ? $this->getNestedFiles($this->item) : collect();
         }
+    }
+
+    public function getNestedFiles(Folder $folder)
+    {
+        $files = $folder->articles->flatMap->files;
+
+        foreach ($folder->allChildren as $subFolder) {
+            $files = $files->concat($this->getNestedFiles($subFolder));
+        }
+
+        return $files;
     }
 };

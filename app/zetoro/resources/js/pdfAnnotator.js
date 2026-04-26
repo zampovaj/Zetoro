@@ -389,6 +389,31 @@ class PDFAnnotator {
         merged.push(current);
         return merged;
     }
+
+    scrollToAnnotation(id, page) {
+        const highlightEl = this.container.querySelector(`.db-highlight[data-id="${id}"]`);
+
+        if (highlightEl) {
+            highlightEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // const originalColor = highlightEl.style.backgroundColor;
+            // highlightEl.style.backgroundColor = "rgba(255, 100, 0, 0.6)";
+            // setTimeout(() => { highlightEl.style.backgroundColor = originalColor; }, 800);
+
+            return;
+
+        } else {
+            const pageEl = this.container.querySelector(`.pdf-page-wrapper[data-page-number="${page}"]`);
+            if (pageEl) {
+                pageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            } else {
+                setTimeout(() => this.scrollToAnnotation(id, page), 500);
+            }
+        }
+
+        setTimeout(() => this.scrollToAnnotation(id, page), 1000);
+    }
 }
 
 window.PDFAnnotator = PDFAnnotator;

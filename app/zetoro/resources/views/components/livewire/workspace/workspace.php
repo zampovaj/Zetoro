@@ -9,6 +9,13 @@ new class extends Component
 
     public ?string $activeTabId = null;
 
+    #[On('request-file-open-scroll')]
+    public function handleFileOpenWithScroll(string $fileId, string $title, string $annotationId, int $pageNumber): void
+    {
+        $this->handleFileOpen($fileId, $title);
+        $this->dispatch('open-annotation', fileId: $fileId, annotationId: $annotationId, pageNumber: $pageNumber);
+    }
+
     #[On('request-file-open')]
     public function handleFileOpen(string $fileId, string $title): void
     {
