@@ -12,7 +12,7 @@ new class extends Component
 {
     public ?Model $item = null;
 
-    public ?string $type = null;
+    public ?string $type = 'root';
 
     public ?string $itemId = null;
 
@@ -29,6 +29,7 @@ new class extends Component
         $this->files = collect();
         $this->children = collect();
         $this->parents = collect();
+        $this->load('root', null);
     }
 
     // #[On('item-deleted')]

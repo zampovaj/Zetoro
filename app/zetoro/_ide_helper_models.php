@@ -70,6 +70,8 @@ namespace App\Models{
  * @property string $path
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Annotation> $annotations
+ * @property-read int|null $annotations_count
  * @property-read \App\Models\Article $article
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File newQuery()
@@ -86,14 +88,16 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Article[] $articles
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\File[] $files
+ * @property-read Collection|Article[] $articles
+ * @property-read Collection|File[] $files
  * @property string $id
  * @property string $name
  * @property string|null $parent_id
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
  * @property-read int|null $articles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Folder> $children
+ * @property-read int|null $children_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Folder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Folder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Folder query()

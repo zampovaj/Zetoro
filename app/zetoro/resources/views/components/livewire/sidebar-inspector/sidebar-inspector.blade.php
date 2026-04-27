@@ -68,7 +68,8 @@
                         <div class="h-2"></div>
                     @endif
 
-                    <div class="text-zinc-300 text-mb text-center bg-zinc-700 rounded-lg py-3">
+                    <div class="text-zinc-300 text-mb text-center bg-zinc-700 rounded-lg py-3 cursor-pointer"
+                        wire:click="load('file', '{{ $file->id }}')" >
                         {{ $file->name }}
                     </div>
 
