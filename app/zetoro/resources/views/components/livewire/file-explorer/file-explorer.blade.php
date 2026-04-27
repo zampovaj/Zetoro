@@ -3,7 +3,20 @@
         class="py-3 border-b border-gray-700 flex justify-between items-center text-sm font-semibold uppercase tracking-wider text-gray-400 pb-4 pr-4">
         <span>Explorer</span>
 
-        <x-create-dropdown :itemId="null" :size="4" />
+        <div>
+
+            <x-create-dropdown :itemId="null" :size="4" />
+
+            <x-action-button
+                action="triggerInspector"
+                type="root"
+                :itemId="null"
+                colorClass="text-zinc-400 hover:text-yellow-500"
+                icon="bars-3-bottom-right"
+                :size="4" >
+            </x-action-button>
+
+        </div>
 
     </div>
 

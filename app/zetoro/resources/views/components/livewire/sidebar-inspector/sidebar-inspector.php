@@ -31,8 +31,24 @@ new class extends Component
         $this->parents = collect();
     }
 
+    // #[On('item-deleted')]
+    public function remove()
+    {
+        $this->reset();
+    }
+
+    #[On('item-updated')]
+    #[On('item-created')]
+    public function refresh()
+    {
+        if ($this->item === null) {
+            return;
+        }
+        $this->load($this->type, $this->itemId);
+    }
+
     #[On('load-inspector')]
-    public function load(string $type, string $itemId)
+    public function load(string $type, ?string $itemId)
     {
         $this->type = $type;
         $this->itemId = $itemId;
@@ -52,6 +68,9 @@ new class extends Component
             $this->children = $this->item?->articles;
             $this->parentName = Folder::find($this->item?->parent_id)?->name ?? 'None';
             $this->files = $this->item ? $this->getNestedFiles($this->item) : collect();
+        } elseif ($this->type === 'root') {
+            $this->item = null;
+            $this->files = File::with('annotations')->get();
         }
     }
 

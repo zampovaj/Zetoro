@@ -50,7 +50,7 @@ new class extends Component
         $this->dispatch('item-deleted', fileIds: $idsToRemove);
     }
 
-    public function triggerInspector(string $type, string $itemId)
+    public function triggerInspector(string $type, ?string $itemId)
     {
         $this->dispatch('load-inspector', type: $type, itemId: $itemId);
     }
