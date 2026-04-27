@@ -12,7 +12,7 @@ class FileForm extends Form
 {
     public ?File $file = null;
 
-    public string $name = 'article';
+    public string $name = '';
     public ?UploadedFile $uploadFile = null;
 
     protected function rules()
@@ -35,12 +35,21 @@ class FileForm extends Form
         $this->name = $file->name;
     }
 
+    public function updatedUploadFile()
+    {
+        if ($this->uploadFile && empty($this->name)) {
+            $this->name = pathinfo($this->uploadFile->getClientOriginalName(), PATHINFO_FILENAME);
+        }
+    }
+
     public function store(?string $parentId = null): File
     {
+        $this->name = $this->name ?: pathinfo($this->uploadFile->getClientOriginalName(), PATHINFO_FILENAME);
+        
         $this->validate();
 
         $folderName = Str::random(16);
-        $safeFileName = Str::slug($this->name ?? 'article') . '.pdf';
+        $safeFileName = Str::slug($this->name) . '.pdf';
 
         $relativePath = $this->uploadFile->storeAs($folderName, $safeFileName, 'pdf_vault');
 
