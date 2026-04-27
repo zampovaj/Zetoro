@@ -13,7 +13,6 @@ use Flux\Flux;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use PharIo\Manifest\License;
 
 new class extends Component
 {
@@ -105,11 +104,16 @@ new class extends Component
 
     public function delete(DeleteService $service)
     {
+        // this code so ugly i need to refactor asap
+        if ($this->type === 'annotation') {
+            $fileId = Annotation::findOrFail($this->editItemId)->file_id;
+        }
+
         $idsToRemove = $service->delete($this->type, $this->editItemId);
         $this->dispatch('item-deleted', fileIds: $idsToRemove);
 
         if ($this->type === 'annotation') {
-            $this->dispatch('pdf-annotation-deleted', id:$this->editItemId);
+            $this->dispatch('annotation-item-deleted', annotationId: $this->editItemId, fileId: $fileId);
         }
 
         match ($this->type) {

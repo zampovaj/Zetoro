@@ -31,17 +31,6 @@ new class extends Component
         $this->parents = collect();
     }
 
-    #[On('annotation-item-created')]
-    #[On('annotation-item-updated')]
-    #[On('item-created')]
-    #[On('item-updated')]
-    #[On('item-deleted')]
-    public function reload()
-    {
-        $this->item = null;
-        $this->load($this->type, $this->itemId);
-    }
-
     #[On('load-inspector')]
     public function load(string $type, string $itemId)
     {

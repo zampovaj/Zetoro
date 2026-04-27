@@ -25,11 +25,23 @@
         }
     },
 
+    addAnnotation(annotation) {
+        if (annotation.file_id != '{{ $this->fileId }}') return;
+
+        this.annotator.addNewAnnotation(annotation);
+    },
+
     updateAnnotation(annotation) {
         if (annotation.file_id != '{{ $this->fileId }}') return;
 
         this.annotator.removeHighlightsFromDOM(annotation.id);
         this.annotator.addNewAnnotation(annotation);
+    },
+
+    removeAnnotation(annotationId, fileId) {
+        if (fileId != '{{ $this->fileId }}') return;
+
+        this.annotator.removeHighlightsFromDOM(annotationId);
     },
 
     handleScrollRequest(fileId, annotationId, pageNumber) {
@@ -43,11 +55,10 @@
     }
 
 }" x-init="initPdf()"
-    class="w-full h-full relative"
-    @annotation-item-created.window="if ($event.detail.annotation.file_id === '{{ $this->fileId }}') annotator.addNewAnnotation($event.detail.annotation)"
+    class="w-full h-full relative" @annotation-item-created.window="addAnnotation($event.detail.annotation)"
     @annotation-item-updated.window="updateAnnotation($event.detail.annotation)"
     @pdf-annotation-clicked.window="$wire.triggerEditHighlight($event.detail.id)"
-    @pdf-annotation-deleted.window="annotator.removeHighlightsFromDOM($event.detail.id)"
+    @annotation-item-deleted.window="removeAnnotation($event.detail.annotationId, $event.detail.fileId)"
     @open-annotation.window="handleScrollRequest($event.detail.fileId, $event.detail.annotationId, $event.detail.pageNumber)">
 
     <div wire:ignore id="{{ $containerId }}"

@@ -6,7 +6,7 @@
 - item-deleted { fileIds } // Array of IDs
 - annotation-item-created { annotation } // Full object
 - annotation-item-updated { annotation } // Full object
-- pdf-annotation-deleted { id }
+- annotation-item-deleted { annotationId, fileId }
 - open-create-modal { type, parentId, payload }
 - open-edit-modal { type, itemId }
 - pdf-hide-tooltip
