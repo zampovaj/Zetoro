@@ -9,6 +9,8 @@ new class extends Component
 {
     public ?File $file;
 
+    public array $filterChoices = ['notes', 'highlights'];
+
     #[On('annotation-item-deleted')]
     public function handleAnnotationDelete(string $fileId, string $annotationId)
     {
@@ -35,5 +37,9 @@ new class extends Component
     public function openAnnotation(string $annotationId, int $pageNumber): void
     {
         $this->dispatch('request-file-open-scroll', fileId: $this->file->id, title: $this->file->name, annotationId: $annotationId, pageNumber: $pageNumber);
+    }
+
+    public function triggerOpenFile() {
+        $this->dispatch('load-inspector', type: 'file', itemId: $this->file->id);
     }
 };

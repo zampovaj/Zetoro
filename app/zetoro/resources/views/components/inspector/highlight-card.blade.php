@@ -1,4 +1,4 @@
-@props(['id', 'fileName', 'pageNumber', 'text', 'note' => null])
+@props(['id', 'pageNumber', 'text', 'note' => null])
 
 <div class="grid grid-cols-[1fr_1.25rem] gap-2 py-2 w-full hover:scale-101 cursor-pointer transition-transform duration-300 ease-in-out"
     wire:click="openAnnotation('{{ $id }}', '{{ $pageNumber }}')">

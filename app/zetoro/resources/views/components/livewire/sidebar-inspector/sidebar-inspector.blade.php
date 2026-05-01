@@ -12,14 +12,14 @@
             'Name' => $name,
             'Path' => $this->item->path,
             'Parent article' => $this->parentName,
-            'Created at' => $this->item->created_at,
-            'Updated at' => $this->item->updated_at,
+            'Created at' => $this->item->created_at->format('d.m.Y, H:i:s'),
+            'Updated at' => $this->item->updated_at->format('d.m.Y, H:i:s'),
         ],
         'folder' => [
             'Name' => $name,
             'Parent folder' => $this->parentName ?? '',
             'Created at' => $this->item->created_at->format('d.m.Y, H:i:s'),
-            'Updated at' => $this->item->updated_at,
+            'Updated at' => $this->item->updated_at->format('d.m.Y, H:i:s'),
         ],
         'article' => [
             'Name' => $name,
@@ -29,8 +29,8 @@
             'Page count' => $this->item->metadata->page_count ?? '',
             'Type' => $this->item->metadata->type ?? '',
             'Citations' => $this->item->metadata->citations ?? '',
-            'Created at' => $this->item->created_at,
-            'Updated at' => $this->item->updated_at,
+            'Created at' => $this->item->created_at->format('d.m.Y, H:i:s'),
+            'Updated at' => $this->item->updated_at->format('d.m.Y, H:i:s'),
         ],
         default => [],
     };
@@ -62,18 +62,27 @@
             @endif
 
             <x-inspector.inspector-section title="Annotations" icon="pencil">
+                
+                <div class="flex pb-2 flex-col">
 
-                @forelse ($this->files->filter(fn($f) => $f->annotations->isNotEmpty()) as $file)
+                    <flux:checkbox.group class="pb-4" wire:model.live="filterChoices" label="Filter">
+                        <flux:checkbox label="Highlights" value="highlights" />
+                        <flux:checkbox label="Notes" value="notes" />
+                    </flux:checkbox.group>
+                
+                    <flux:separator></flux:separator>
+
+                </div>
+        
+                @forelse ($this->filterFiles() as $file)
                     @if (!$loop->first)
                         <div class="h-2"></div>
                     @endif
 
-                    <div class="text-zinc-300 text-mb text-center bg-zinc-700 rounded-lg py-3 cursor-pointer"
-                        wire:click="load('file', '{{ $file->id }}')" >
-                        {{ $file->name }}
-                    </div>
-
-                    <livewire:livewire.inspector-annotations-section :file="$file">
+                    <livewire:livewire.inspector-annotations-section
+                        :file="$file"
+                        :filterChoices="$this->filterChoices"
+                        :wire:key="'file-'.$file->id . implode('-', $filterChoices)" >
                     </livewire:livewire.inspector-annotations-section>
                 @empty
                     <span class="font-normal">

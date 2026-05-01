@@ -16,6 +16,8 @@ new class extends Component
 
     public ?string $itemId = null;
 
+    public array $filterChoices = ['highlights', 'notes'];
+
     public Collection $files;
 
     public Collection $children;
@@ -84,5 +86,26 @@ new class extends Component
         }
 
         return $files;
+    }
+
+    public function filterFiles(): Collection
+    {
+        $files = $this->files->filter(fn ($f) => $f->annotations->isNotEmpty());
+
+        $showNotes = in_array('notes', $this->filterChoices);
+        $showHighlights = in_array('highlights', $this->filterChoices);
+
+        if ($showNotes && $showHighlights) {
+            return $files;
+        }
+        if (! $showNotes && ! $showHighlights) {
+            return collect();
+        }
+
+        return $files->filter(function ($f) use ($showNotes) {
+            return $f->annotations->contains(function ($a) use ($showNotes) {
+                return $showNotes ? filled($a->note) : blank($a->note);
+            });
+        });
     }
 };
