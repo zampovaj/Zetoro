@@ -120,9 +120,8 @@
                     <livewire:livewire.inspector-annotations-section
                         :file="$file"
                         :filterChoices="$this->filterChoices"
-                        :wire:key="'file-'.$file->id . implode('-', $filterChoices)"
                         :showName="($this->type != 'file')"
-                        :wire:key="$this->type" >
+                        :wire:key="'file-'.$file->id.'-type-'.$this->type.'-filters-'.implode('-', $filterChoices)" >
                     </livewire:livewire.inspector-annotations-section>
 
                 @empty

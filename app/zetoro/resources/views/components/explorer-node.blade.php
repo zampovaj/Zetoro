@@ -36,8 +36,8 @@
         @elseif ($type === 'file')
             wire:click='openFile("{{ $item->id }}", "{{ $item->name }}")' @endif>
 
-        <div class="flex items-center gap-2 overflow-hidden">
-            <div class="w-4 h-4 flex items-center justify-center">
+        <div class="flex items-center gap-2 min-w-0 overflow-hidden">
+            <div class="w-4 h-4 flex-none flex items-center justify-center">
                 @if ($isExpandable && $hasChildren)
                     <flux:icon.chevron-right class="size-3 text-zinc-400 transition-transform duration-200"
                         x-bind:class="expanded ? 'rotate-90' : ''" />
@@ -46,7 +46,7 @@
 
             <flux:icon dynamic :name="$icon" class="size-4 text-zinc-400" />
 
-            <span class="truncate text-zinc-400">
+            <span class="truncate text-zinc-400 min-w-0">
                 {{ $type === 'article' ? $item->metadata->title ?? 'Untitled' : $item->name }}
             </span>
         </div>
