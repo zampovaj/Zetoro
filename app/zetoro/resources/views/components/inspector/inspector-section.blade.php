@@ -15,7 +15,7 @@
         </button>
 
         <div x-show="expanded" x-collapse>
-            <div class="p-4 text-sm text-zinc-400 space-y-2">
+            <div class="p-4 pt-2 text-sm text-zinc-400 space-y-2">
                 {{ $slot }}
             </div>
         </div>

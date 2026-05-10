@@ -46,7 +46,7 @@
 
             <flux:icon dynamic :name="$icon" class="size-4 text-zinc-400" />
 
-            <span class="truncat text-zinc-400">
+            <span class="truncate text-zinc-400">
                 {{ $type === 'article' ? $item->metadata->title ?? 'Untitled' : $item->name }}
             </span>
         </div>

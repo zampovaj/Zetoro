@@ -27,7 +27,7 @@ new class extends Component
 
     public function refresh(string $fileId)
     {
-        if ($this->file->id != $fileId) {
+        if ($this->file != null && $this->file?->id != $fileId) {
             return;
         }
 

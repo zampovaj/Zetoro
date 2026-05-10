@@ -3,7 +3,7 @@
 ### ITEMS
 - item-created { type, itemId }
 - item-updated { type, itemId }
-- item-deleted { fileIds } // Array of IDs
+- item-deleted { fileIds, articleId } // Array of IDs
 - annotation-item-created { annotation } // Full object
 - annotation-item-updated { annotation } // Full object
 - annotation-item-deleted { annotationId, fileId }

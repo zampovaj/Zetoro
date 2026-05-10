@@ -2,8 +2,8 @@
 
 @php
     $name = match ($this->type) {
-        'file', 'folder' => $item->name,
-        'article' => $item->metadata->title,
+        'file', 'folder' => $this->item->name,
+        'article' => $this->item->metadata->title,
         default => '',
     };
 
@@ -43,7 +43,7 @@
 
     <div class="p-6 w-ful dark:border-zinc-700 flex justify-between items-start ">
         <div>
-            <flux:heading size="lg" class="truncate max-w-50">
+            <flux:heading size="lg" class="max-w-100">
                 {{ $name }}
             </flux:heading>
             <flux:subheading class="uppercase text-xs tracking-wider mt-1">

@@ -5,51 +5,106 @@ use App\Models\File;
 use App\Models\Folder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 new class extends Component
 {
-    public ?Model $item = null;
-
     public ?string $type = 'root';
 
     public ?string $itemId = null;
 
     public array $filterChoices = ['highlights', 'notes'];
 
-    public Collection $files;
+    #[Computed]
+    public function item(): ?Model
+    {
+        return match ($this->type) {
+            'root' => null,
+            'file' => File::with('annotations')->find($this->itemId),
+            'article' => Article::with('files.annotations')->find($this->itemId),
+            'folder' => Folder::with(
+                'allChildren.articles.files.annotations',
+                'articles.files.annotations'
+            )->find($this->itemId),
+            default => null,
+        };
+    }
 
-    public Collection $children;
+    #[Computed]
+    public function files(): Collection
+    {
+        $item = $this->item();
 
-    public Collection $parents;
+        return match ($this->type) {
+            'file' => $item ? collect([$item]) : collect(),
+            'article' => $item?->files ?? collect(),
+            'folder' => $item ? $this->getNestedFiles($item) : collect(),
+            'root' => File::with('annotations')->get(),
+            default => collect(),
+        };
+    }
 
-    public ?string $parentName = null;
+    #[Computed]
+    public function children(): Collection
+    {
+        $item = $this->item();
+
+        return match ($this->type) {
+            'article' => $item?->files ?? collect(),
+            'folder' => $item?->articles ?? collect(),
+            default => collect(),
+        };
+    }
+
+    #[Computed]
+    public function parents(): Collection
+    {
+        $item = $this->item();
+
+        return match ($this->type) {
+            'file' => collect([Article::find($item?->article_id)])->filter(),
+            'article' => $item?->folders ?? collect(),
+            'folder' => collect([Folder::find($item?->parent_id)])->filter(),
+            default => collect(),
+        };
+    }
+
+    #[Computed]
+    public function parentName(): string
+    {
+        return match ($this->type) {
+            'file' => $this->parents()->first()?->metadata->title ?? 'None',
+            'folder' => $this->parents()->first()?->name ?? 'None',
+            default => 'None',
+        };
+    }
 
     public function mount()
     {
-        $this->files = collect();
-        $this->children = collect();
-        $this->parents = collect();
         $this->load('root', null);
     }
 
-    // #[On('item-deleted')]
-    public function remove()
+    #[On('item-deleted')]
+    public function remove(array $fileIds, ?string $itemId)
     {
-        $this->reset();
+        if ($this->itemId === $itemId) {
+            $this->load('root', null);
+        } else {
+            $this->refresh();
+        }
     }
 
     #[On('item-updated')]
     #[On('item-created')]
-    #[On('item-deleted')]
     public function refresh()
     {
-        if ($this->item === null) { 
-            return;
-        }
-        
-        $this->load($this->type, $this->itemId);
+        unset($this->item);
+        unset($this->files);
+        unset($this->children);
+        unset($this->parents);
+        unset($this->parentName);
     }
 
     #[On('load-inspector')]
@@ -57,33 +112,11 @@ new class extends Component
     {
         $this->type = $type;
         $this->itemId = $itemId;
-        $this->children = collect();
-        $this->parents = collect();
 
-        if ($this->type === 'file') {
-            $this->item = File::with('annotations')->find($itemId);
-            $this->parents = collect([Article::find($this->item?->article_id)])->filter();
-            $this->parentName = $this->parents->first()?->metadata->title ?? 'None';
-            $this->files = $this->item ? collect([$this->item]) : collect();
-        } elseif ($this->type === 'article') {
-            $this->item = Article::with('files.annotations')->find($itemId);
-            $this->parents = $this->item?->folders;
-            $this->children = $this->item?->files;
-            $this->files = $this->item?->files ?? collect();
-        } elseif ($this->type === 'folder') {
-            $this->item = Folder::with('articles.files.annotations')->find($itemId);
-            $this->item?->load('allChildren.articles.files.annotations', 'articles.files.annotations');
-            $this->children = $this->item?->articles;
-            $this->parents = collect([Folder::find($this->item?->parent_id)])->filter();
-            $this->parentName = $this->parents->first()?->name ?? 'None';
-            $this->files = $this->item ? $this->getNestedFiles($this->item) : collect();
-        } elseif ($this->type === 'root') {
-            $this->item = null;
-            $this->files = File::with('annotations')->get();
-        }
+        $this->refresh();
     }
 
-    public function getNestedFiles(Folder $folder)
+    private function getNestedFiles(Folder $folder): Collection
     {
         $files = $folder->articles->flatMap->files;
 
@@ -96,7 +129,7 @@ new class extends Component
 
     public function filterFiles(): Collection
     {
-        $files = $this->files->filter(fn ($f) => $f->annotations->isNotEmpty());
+        $files = $this->files()->filter(fn ($f) => $f->annotations->isNotEmpty());
 
         $showNotes = in_array('notes', $this->filterChoices);
         $showHighlights = in_array('highlights', $this->filterChoices);
@@ -104,6 +137,7 @@ new class extends Component
         if ($showNotes && $showHighlights) {
             return $files;
         }
+
         if (! $showNotes && ! $showHighlights) {
             return collect();
         }
