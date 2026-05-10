@@ -19,6 +19,16 @@ class PDFAnnotator {
         try {
             const pdf = await pdfjsLib.getDocument(this.pdfUrl).promise;
 
+            this.container.style.height = '100%';
+            let containerWidth = this.container.clientWidth - 32;
+
+            if (containerWidth <= 0) containerWidth = 736; 
+
+            const firstPage = await pdf.getPage(1);
+            const unscaledBaseViewport = firstPage.getViewport({ scale: 1.0 });
+            
+            this.globalScale = containerWidth / unscaledBaseViewport.width;
+
             for (let i = 1; i <= pdf.numPages; i++) {
                 await this.renderPage(pdf, i);
             }
@@ -38,17 +48,11 @@ class PDFAnnotator {
         const page = await pdf.getPage(pageNumber);
         const unscaledViewport = page.getViewport({ scale: 1.0 });
 
-        this.container.style.height = '100%';
-
-        let containerWidth = this.container.clientWidth - 32; // 32 for padding
-        if (containerWidth <= 0) containerWidth = 736; // fallback width
-
-        const scale = containerWidth / unscaledViewport.width;
-        const viewport = page.getViewport({ scale: scale });
+        const viewport = page.getViewport({ scale: this.globalScale });
 
         // page
         const pageDiv = document.createElement('div');
-        pageDiv.className = 'pdf-page-wrapper relative mx-auto mb-6 bg-white shadow-lg';
+        pageDiv.className = 'pdf-page-wrapper relative mx-auto mb-6 bg-white shadow-lg overflow-hidden';
         pageDiv.dataset.pageNumber = pageNumber;
         pageDiv.style.width = `${Math.floor(viewport.width)}px`;
         pageDiv.style.height = `${Math.floor(viewport.height)}px`;
@@ -67,7 +71,7 @@ class PDFAnnotator {
         // text layer
         const textLayerDiv = document.createElement('div');
         textLayerDiv.className = 'textLayer absolute top-0 left-0 w-full h-full';
-        textLayerDiv.style.setProperty('--scale-factor', scale);
+        textLayerDiv.style.setProperty('--scale-factor', this.globalScale);
         pageDiv.appendChild(textLayerDiv);
 
         // anotation layer
