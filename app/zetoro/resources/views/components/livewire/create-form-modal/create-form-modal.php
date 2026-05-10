@@ -37,6 +37,11 @@ new class extends Component
     #[On('open-create-modal')]
     public function loadCreateModal(string $type, ?string $parentId = null, array $payload = [])
     {
+        $this->articleForm->reset();
+        $this->folderForm->reset();
+        $this->fileForm->reset();
+        $this->annotationForm->reset();
+
         $this->mode = 'create';
         $this->type = $type;
         $this->editItemId = null;
@@ -110,10 +115,11 @@ new class extends Component
         }
 
         $idsToRemove = $service->delete($this->type, $this->editItemId);
-        $this->dispatch('item-deleted', fileIds: $idsToRemove);
 
         if ($this->type === 'annotation') {
             $this->dispatch('annotation-item-deleted', annotationId: $this->editItemId, fileId: $fileId);
+        } else {
+            $this->dispatch('item-deleted', fileIds: $idsToRemove, itemId: $this->editItemId);
         }
 
         match ($this->type) {

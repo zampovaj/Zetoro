@@ -53,7 +53,7 @@ new class extends Component
 
         return match ($this->type) {
             'article' => $item?->files ?? collect(),
-            'folder' => $item?->articles ?? collect(),
+            'folder' => ($item?->children ?? collect())->concat($item?->articles ?? collect()),
             default => collect(),
         };
     }
@@ -98,6 +98,9 @@ new class extends Component
 
     #[On('item-updated')]
     #[On('item-created')]
+    #[On('annotation-item-created')]
+    #[On('annotation-item-updated')]
+    #[On('annotation-item-deleted')]
     public function refresh()
     {
         unset($this->item);

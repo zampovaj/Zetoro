@@ -3,11 +3,14 @@
 use App\Models\Annotation;
 use App\Models\File;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
 new class extends Component
 {
-    public ?File $file;
+    public bool $showName = true;
+
+    public ?File $file = null;
 
     public array $filterChoices = ['notes', 'highlights'];
 
