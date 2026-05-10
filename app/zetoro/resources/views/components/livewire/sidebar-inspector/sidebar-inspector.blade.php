@@ -65,37 +65,36 @@
                 <x-inspector.inspector-section title="Children" icon="list-bullet">
 
                     @if ($this->type === 'article')
-
-                        @forelse ($this->item->files as $file)
-                            <x-inspector.connected-item
-                                type="file"
-                                :name="$file->name"
-                                :id="$file->id" >
-                            </x-inspector.connected-item>
-                        @empty
-                        @endforelse
+                    
+                        <x-inspector.section-items-list
+                            :items="$this->item->files"
+                            type="file" >
+                        </x-inspector.section-items-list>
                     
                     @elseif ($this->type === 'folder')
 
-                        @forelse ($this->item->children as $folder)
-                            <x-inspector.connected-item
-                                type="folder"
-                                :name="$folder->name"
-                                :id="$folder->id" >
-                            </x-inspector.connected-item>
-                        @empty
-                        @endforelse
+                        <x-inspector.section-items-list
+                            :items="$this->item->children"
+                            type="folder" >
+                        </x-inspector.section-items-list>
 
-                        @forelse ($this->item->articles as $article)
-                            <x-inspector.connected-item
-                                type="article"
-                                :name="$article->metadata->title"
-                                :id="$article->id" >
-                            </x-inspector.connected-item>
-                        @empty
-                        @endforelse
+                        <x-inspector.section-items-list
+                            :items="$this->item->articles"
+                            type="article" >
+                        </x-inspector.section-items-list>
 
                     @endif
+
+                </x-inspector.inspector-section>
+            @endif
+
+            @if ($this->parents->count() > 0)
+                <x-inspector.inspector-section title="Parents" icon="list-bullet">
+
+                    <x-inspector.section-items-list
+                        :items="$this->parents"
+                        :type="$this->type === 'file' ? 'article' : 'folder'" >
+                    </x-inspector.section-items-list>
 
                 </x-inspector.inspector-section>
             @endif

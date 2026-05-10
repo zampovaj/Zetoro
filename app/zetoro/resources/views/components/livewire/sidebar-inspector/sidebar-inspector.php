@@ -42,11 +42,13 @@ new class extends Component
 
     #[On('item-updated')]
     #[On('item-created')]
+    #[On('item-deleted')]
     public function refresh()
     {
-        if ($this->item === null) {
+        if ($this->item === null) { 
             return;
         }
+        
         $this->load($this->type, $this->itemId);
     }
 
@@ -56,10 +58,12 @@ new class extends Component
         $this->type = $type;
         $this->itemId = $itemId;
         $this->children = collect();
+        $this->parents = collect();
 
         if ($this->type === 'file') {
             $this->item = File::with('annotations')->find($itemId);
-            $this->parentName = Article::findOrFail($this->item?->article_id)->metadata->title;
+            $this->parents = collect([Article::find($this->item?->article_id)])->filter();
+            $this->parentName = $this->parents->first()?->metadata->title ?? 'None';
             $this->files = $this->item ? collect([$this->item]) : collect();
         } elseif ($this->type === 'article') {
             $this->item = Article::with('files.annotations')->find($itemId);
@@ -70,7 +74,8 @@ new class extends Component
             $this->item = Folder::with('articles.files.annotations')->find($itemId);
             $this->item?->load('allChildren.articles.files.annotations', 'articles.files.annotations');
             $this->children = $this->item?->articles;
-            $this->parentName = Folder::find($this->item?->parent_id)?->name ?? 'None';
+            $this->parents = collect([Folder::find($this->item?->parent_id)])->filter();
+            $this->parentName = $this->parents->first()?->name ?? 'None';
             $this->files = $this->item ? $this->getNestedFiles($this->item) : collect();
         } elseif ($this->type === 'root') {
             $this->item = null;
