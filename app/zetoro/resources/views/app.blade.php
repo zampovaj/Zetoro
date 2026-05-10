@@ -21,7 +21,7 @@
         
         <div class="flex h-full w-full">
             
-            <div class="flex-1 flex flex-col min-w-0 pr-80">
+            <div class="flex-1 flex flex-col min-w-0 lg:pr-80">
                 <livewire:livewire.workspace></livewire:livewire.workspace>
                 <livewire:livewire.create-form-modal></livewire:livewire.create-form-modal>
             </div>

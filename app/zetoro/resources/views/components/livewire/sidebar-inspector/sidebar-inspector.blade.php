@@ -61,11 +61,50 @@
                 </x-inspector.section-list>
             @endif
 
+            @if($this->children->count() > 0)
+                <x-inspector.inspector-section title="Children" icon="list-bullet">
+
+                    @if ($this->type === 'article')
+
+                        @forelse ($this->item->files as $file)
+                            <x-inspector.connected-item
+                                type="file"
+                                :name="$file->name"
+                                :id="$file->id" >
+                            </x-inspector.connected-item>
+                        @empty
+                        @endforelse
+                    
+                    @elseif ($this->type === 'folder')
+
+                        @forelse ($this->item->children as $folder)
+                            <x-inspector.connected-item
+                                type="folder"
+                                :name="$folder->name"
+                                :id="$folder->id" >
+                            </x-inspector.connected-item>
+                        @empty
+                        @endforelse
+
+                        @forelse ($this->item->articles as $article)
+                            <x-inspector.connected-item
+                                type="article"
+                                :name="$article->metadata->title"
+                                :id="$article->id" >
+                            </x-inspector.connected-item>
+                        @empty
+                        @endforelse
+
+                    @endif
+
+                </x-inspector.inspector-section>
+            @endif
+
             <x-inspector.inspector-section title="Annotations" icon="pencil">
                 
-                <div class="flex pb-2 flex-col">
+                <div class="flex pb-2 flex-col [&_*]:!text-zinc-400 ">
 
-                    <flux:checkbox.group class="pb-4" wire:model.live="filterChoices" label="Filter">
+                    <flux:checkbox.group class="pb-4 text-zinc-400" wire:model.live="filterChoices" label="Filter">
                         <flux:checkbox label="Highlights" value="highlights" />
                         <flux:checkbox label="Notes" value="notes" />
                     </flux:checkbox.group>
@@ -84,6 +123,7 @@
                         :filterChoices="$this->filterChoices"
                         :wire:key="'file-'.$file->id . implode('-', $filterChoices)" >
                     </livewire:livewire.inspector-annotations-section>
+
                 @empty
                     <span class="font-normal">
                         {{ 'No annotations available.' }}

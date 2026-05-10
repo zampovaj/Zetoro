@@ -1,6 +1,6 @@
 
 <div>
-    <div class="text-zinc-300 text-mb text-center bg-zinc-700 rounded-lg py-3 cursor-pointer"
+    <div class="text-zinc-300 text-mb text-center bg-zinc-700 rounded-lg py-3 cursor-pointer transition-all ease-in-out hover:bg-zinc-400 hover:text-zinc-900 hover:scale-98"
         wire:click="triggerOpenFile()" >
         {{ $file->name }}
     </div>

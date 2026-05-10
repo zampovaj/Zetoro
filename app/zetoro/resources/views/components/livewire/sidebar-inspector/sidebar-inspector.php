@@ -55,6 +55,7 @@ new class extends Component
     {
         $this->type = $type;
         $this->itemId = $itemId;
+        $this->children = collect();
 
         if ($this->type === 'file') {
             $this->item = File::with('annotations')->find($itemId);
