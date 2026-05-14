@@ -1,4 +1,4 @@
-@prop(['containerId'])
+@props(['containerId'])
 
 <div x-data="{
     show: false,
