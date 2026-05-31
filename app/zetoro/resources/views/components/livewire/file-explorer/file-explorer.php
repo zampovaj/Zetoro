@@ -48,6 +48,8 @@ new class extends Component
         $idsToRemove = $service->delete($type, $itemId);
 
         $this->dispatch('item-deleted', fileIds: $idsToRemove, itemId: $itemId);
+
+        $this->loadData();
     }
 
     public function triggerInspector(string $type, ?string $itemId)

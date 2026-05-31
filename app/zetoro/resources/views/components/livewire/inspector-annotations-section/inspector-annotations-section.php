@@ -1,9 +1,7 @@
 <?php
 
-use App\Models\Annotation;
 use App\Models\File;
 use Livewire\Attributes\On;
-use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
 new class extends Component
@@ -42,7 +40,8 @@ new class extends Component
         $this->dispatch('request-file-open-scroll', fileId: $this->file->id, title: $this->file->name, annotationId: $annotationId, pageNumber: $pageNumber);
     }
 
-    public function triggerOpenFile() {
+    public function openFileInInspector()
+    {
         $this->dispatch('load-inspector', type: 'file', itemId: $this->file->id);
     }
 };

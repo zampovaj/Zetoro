@@ -2,8 +2,8 @@
 
 @php
     $name = match ($this->type) {
-        'file', 'folder' => $this->item->name,
-        'article' => $this->item->metadata->title,
+        'file', 'folder' => $this->item?->name,
+        'article' => $this->item?->metadata->title,
         default => '',
     };
 
@@ -41,14 +41,51 @@
             bg-zinc-50 dark:bg-zinc-900
             border-l border-zinc-200 dark:border-zinc-700 z-20">
 
-    <div class="p-6 w-ful dark:border-zinc-700 flex justify-between items-start ">
-        <div>
-            <flux:heading size="lg" class="max-w-100">
-                {{ $name }}
-            </flux:heading>
-            <flux:subheading class="uppercase text-xs tracking-wider mt-1">
-                {{ $this->type }}
-            </flux:subheading>
+    <div class="p-6 w-ful dark:border-zinc-700 flex justify-between items-start w-full">
+        <div class="flex flex-col w-full gap-2">
+            @if ($this->type === 'file')
+                
+                <flux:heading size="lg" class="max-w-100 cursor-pointer"
+                    wire:click="triggerOpenFile()">
+                    {{ $name }}
+                </flux:heading>
+
+            @elseif ($this->type != 'root' && $this->itemId != null)
+                
+                <flux:heading size="lg" class="max-w-100">
+                    {{ $name }}
+                </flux:heading>
+            
+            @endif
+
+            <div class="flex flex-row w-full justify-between">
+    
+                <div class="flex flex-col">
+                    <flux:subheading class="uppercase text-xs tracking-wider mt-1">
+                        {{ $this->type }}
+                    </flux:subheading>
+                </div>
+
+                @if ($this->type != 'root' && $this->itemId != null)
+
+                    <div class="flex flex-row gap-2 items-start px-2 scale-120">
+                        <x-action-button
+                            action="triggerEdit"
+                            :type="$this->type"
+                            :itemId="$this->itemId"
+                            colorClass="text-zinc-400 hover:text-blue-500"
+                            icon="pencil" >
+                        </x-action-button>
+                        <x-action-button
+                            action="triggerDelete"
+                            :type="$this->type"
+                            :itemId="$this->itemId"
+                            colorClass="text-zinc-400 hover:text-red-500"
+                            icon="trash" >
+                        </x-action-button>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 

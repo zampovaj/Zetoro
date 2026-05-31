@@ -3,6 +3,7 @@
 use App\Models\Article;
 use App\Models\File;
 use App\Models\Folder;
+use App\Services\DeleteService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -150,5 +151,25 @@ new class extends Component
                 return $showNotes ? filled($a->note) : blank($a->note);
             });
         });
+    }
+
+    public function triggerOpenFile() {
+        if ($this->type != 'file') return;
+
+        $this->dispatch('request-file-open', fileId: $this->itemId, title: $this->item->name);
+    }
+
+    public function triggerEdit(): void
+    {
+        $this->dispatch('open-edit-modal', type: $this->type, itemId: $this->itemId);
+    }
+
+    public function triggerDelete(DeleteService $service): void
+    {
+        $idsToRemove = $service->delete($this->type, $this->itemId);
+
+        $this->dispatch('item-deleted', fileIds: $idsToRemove, itemId: $this->itemId);
+
+        $this->load('root', null);
     }
 };
